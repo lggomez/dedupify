@@ -27,3 +27,17 @@
 *.exe
 *.out
 *.app
+
+src/deDupify\.VC\.opendb
+
+src/FileSystem/x64/Debug/FileSystem\.tlog/
+
+src/WinTestProject/x64/Debug/WinTestProject\.tlog/
+
+src/WinTestProject/x64/Debug/
+
+*.ipch
+
+src/FileSystem/x64/Debug/
+
+*.sdf
