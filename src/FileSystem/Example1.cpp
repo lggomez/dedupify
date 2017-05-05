@@ -14,10 +14,8 @@ Example1::~Example1()
 {
 }
 
-std::vector<boost::filesystem::path>& Example1::GetImagePaths(std::string & dir_path)
+void Example1::GetImagePaths(const std::string & dir_path, std::vector<boost::filesystem::path>& filePaths)
 {
-	std::vector<boost::filesystem::path> imagePaths;
-
 	MagickCore::ExceptionInfo* exceptionInfo = MagickCore::AcquireExceptionInfo();
 	size_t number_formats;
 	char** formats = MagickCore::GetMagickList("*", &number_formats, exceptionInfo);
@@ -28,15 +26,13 @@ std::vector<boost::filesystem::path>& Example1::GetImagePaths(std::string & dir_
 		int i = 0;
 		while (i < number_formats) {
 			if (iterator->path().filename().extension().compare(std::string(formats[i])) == 0) {
-				imagePaths.push_back(iterator->path());
+				filePaths.push_back(iterator->path());
 				cout << (iterator->path().filename()) << endl;
 				break;
 			}
-			i++;
+			++i;
 		}
 	}
 
 	(void)MagickCore::DestroyExceptionInfo(exceptionInfo);
-
-	return imagePaths;
 }
