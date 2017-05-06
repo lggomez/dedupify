@@ -1,2 +1,2 @@
-# dedupify
+# deDupify
 WIP: duplicate image finder

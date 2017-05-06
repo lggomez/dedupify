@@ -1,0 +1,2 @@
+Native command prompt:
+bjam --build-dir=c:\boost --build-type=complete --toolset=msvc-14.0 address-model=64 architecture=x86 --with-system
