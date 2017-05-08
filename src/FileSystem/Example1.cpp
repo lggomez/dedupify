@@ -21,18 +21,28 @@ void Example1::GetImagePaths(const std::string & dir_path, std::vector<boost::fi
 
 	int i = 0;
 	while (i < number_formats) {
+		boost::to_upper(formats[i]);
 		formatIndex.insert(std::pair<std::string, bool>(std::string(formats[i]), true));
 		++i;
 	}
 
-	fs::directory_iterator iterator(dir_path);
-	for (; iterator != fs::directory_iterator(); ++iterator)
+	if (!fs::exists(dir_path)) return;
+	fs::recursive_directory_iterator end_itr;
+	for (fs::recursive_directory_iterator itr(dir_path);
+		itr != end_itr;
+		++itr)
 	{
-		const std::string file = iterator->path().filename().extension().string();
-		if (formatIndex.find(file) != formatIndex.end()) {
-			filePaths.push_back(iterator->path());
-			cout << (iterator->path().filename()) << endl;
-			break;
+		if (!is_directory(*itr))
+		{
+			cout << itr->path() << std::endl;
+			std::string filePath = itr->path().extension().string();
+			boost::erase_all(filePath, ".");
+			boost::to_upper(filePath);
+
+			if (formatIndex.find(filePath) != formatIndex.end()) {
+				filePaths.push_back(itr->path());
+				//break;
+			}
 		}
 	}
 
