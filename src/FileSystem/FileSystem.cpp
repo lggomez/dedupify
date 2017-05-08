@@ -1,18 +1,18 @@
 #include "stdafx.h"
-#include "Example1.h"
+#include "FileSystem.h"
 
 using namespace std;
 namespace fs = boost::filesystem;
 
-Example1::Example1()
+FileSystem::FileSystem()
 {
 }
 
-Example1::~Example1()
+FileSystem::~FileSystem()
 {
 }
 
-void Example1::GetImagePaths(const std::string & dir_path, std::vector<boost::filesystem::path>& filePaths)
+void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::filesystem::path>& filePaths)
 {
 	MagickCore::ExceptionInfo* exceptionInfo = MagickCore::AcquireExceptionInfo();
 	size_t number_formats;

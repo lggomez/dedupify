@@ -5,10 +5,12 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileSystem", "FileSystem\FileSystem.vcxproj", "{882ECA74-3E64-4706-A2D7-81D2CE12B2AC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinTestProject", "WinTestProject\WinTestProject.vcxproj", "{44FF3072-52F6-4B8E-A449-C2911E9877B0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeDupify", "DeDupify\DeDupify.vcxproj", "{44FF3072-52F6-4B8E-A449-C2911E9877B0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{882ECA74-3E64-4706-A2D7-81D2CE12B2AC} = {882ECA74-3E64-4706-A2D7-81D2CE12B2AC}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageProcessor", "ImageProcessor\ImageProcessor.vcxproj", "{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,14 @@ Global
 		{44FF3072-52F6-4B8E-A449-C2911E9877B0}.Release|x64.Build.0 = Release|x64
 		{44FF3072-52F6-4B8E-A449-C2911E9877B0}.Release|x86.ActiveCfg = Release|Win32
 		{44FF3072-52F6-4B8E-A449-C2911E9877B0}.Release|x86.Build.0 = Release|Win32
+		{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}.Debug|x64.ActiveCfg = Debug|x64
+		{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}.Debug|x64.Build.0 = Debug|x64
+		{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}.Debug|x86.ActiveCfg = Debug|Win32
+		{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}.Debug|x86.Build.0 = Debug|Win32
+		{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}.Release|x64.ActiveCfg = Release|x64
+		{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}.Release|x64.Build.0 = Release|x64
+		{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}.Release|x86.ActiveCfg = Release|Win32
+		{9EFE0922-7B72-4FFA-B3D4-4A9F080ABC6D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

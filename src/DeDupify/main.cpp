@@ -2,7 +2,8 @@
 //
 
 #include "stdafx.h"
-#include "../FileSystem/Example1.h"
+#include "../FileSystem/FileSystem.h"
+#include "../ImageProcessor/ImageProcessor.h"
 
 void ReportImages(std::vector<boost::filesystem::path> paths) {
 	std::cout << "Matches:" << std::endl;
@@ -17,7 +18,7 @@ void ReportImages(std::vector<boost::filesystem::path> paths) {
 
 int main(int argc, char* argv[])
 {
-	Example1 ex1;
+	FileSystem ex1;
 	std::vector<boost::filesystem::path> paths;
 	ex1.GetImagePaths("c:\\imgtest", paths);
 
