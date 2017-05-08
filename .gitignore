@@ -319,3 +319,4 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+src/WinTestProject/WinTestProject\.vcxproj\.filters

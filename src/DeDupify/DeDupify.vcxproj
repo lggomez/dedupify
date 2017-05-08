@@ -161,6 +161,14 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FileSystem\FileSystem.vcxproj">
+      <Project>{882eca74-3e64-4706-a2d7-81d2ce12b2ac}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageProcessor\ImageProcessor.vcxproj">
+      <Project>{9efe0922-7b72-4ffa-b3d4-4a9f080abc6d}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
