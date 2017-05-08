@@ -38,7 +38,7 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 					Color pixelColor = image.pixelColor(x, y);
 					Color nextPixelColor = image.pixelColor(x + 1, y);
 
-					if (pixelColor.quantumBlue > nextPixelColor.quantumBlue) {
+					if (pixelColor.quantumBlue() > nextPixelColor.quantumBlue()) {
 						hash[x + y*x] = '0';
 					}
 					else {
