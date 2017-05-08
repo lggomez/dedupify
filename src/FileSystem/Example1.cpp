@@ -34,14 +34,12 @@ void Example1::GetImagePaths(const std::string & dir_path, std::vector<boost::fi
 	{
 		if (!is_directory(*itr))
 		{
-			cout << itr->path() << std::endl;
 			std::string filePath = itr->path().extension().string();
 			boost::erase_all(filePath, ".");
 			boost::to_upper(filePath);
 
 			if (formatIndex.find(filePath) != formatIndex.end()) {
 				filePaths.push_back(itr->path());
-				//break;
 			}
 		}
 	}
