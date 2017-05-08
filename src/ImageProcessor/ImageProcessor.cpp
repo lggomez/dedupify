@@ -13,7 +13,7 @@ ImageProcessor::~ImageProcessor()
 }
 
 void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes) {
-	size_t quantizationSize = 9;
+	ssize_t quantizationSize = 9;
 	InitializeMagick(currentPath.c_str());
 
 	for (boost::filesystem::path p : *filePaths)
