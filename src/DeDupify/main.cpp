@@ -18,13 +18,14 @@ int main(int argc, char* argv[])
 {
 	FileSystem ex1;
 	std::vector<boost::filesystem::path> paths;
+	std::map<std::string, char*> imageHashes;
 	ex1.GetImagePaths("c:\\imgtest", &paths);
 
 	ReportImages(&paths);
 	std::cout << "Finished reading images" << std::endl;
 
 	ImageProcessor im1;
-	im1.ReduceToHash(argv[0], &paths);
+	im1.ReduceToHash(argv[0], &paths, &imageHashes);
 	std::cout << "Finished reducing images" << std::endl;
 
 	std::string str;

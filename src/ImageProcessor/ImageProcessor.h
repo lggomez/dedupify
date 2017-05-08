@@ -13,6 +13,6 @@ class ImageProcessor
 public:
 	ImageProcessor();
 	~ImageProcessor();
-	std::map<std::string, char*>* ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths);
+	void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes);
 };
 

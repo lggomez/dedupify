@@ -11,18 +11,13 @@ ImageProcessor::~ImageProcessor()
 {
 }
 
-std::map<std::string, char*>* ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths) {
+void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes) {
 	size_t quantizationSize = 8;
 	Magick::InitializeMagick(currentPath.c_str());
-
-	std::map<std::string, char*> imageHashMap;
-	std::vector<std::string> keys;
-	std::vector<char*> values;
 
 	for (boost::filesystem::path p : *filePaths)
 	{
 		Magick::Image image;
-		keys.push_back(p.string());
 
 		try {
 			const std::string imagePath = p.string();
@@ -78,19 +73,11 @@ std::map<std::string, char*>* ImageProcessor::ReduceToHash(const std::string cur
 				}
 			}
 
-			values.push_back(hash);
+			imageHashes->insert(std::pair<std::string, char*>(p.string(), hash));
 		}
 		catch (Magick::Exception &error_)
 		{
 			cout << "Caught exception: " << error_.what() << endl;
 		}
-
-		for (std::map<std::string, char*>::iterator it = imageHashMap.begin(); it != imageHashMap.end(); ++it)
-		{
-			keys.push_back(it->first);
-			values.push_back(it->second);
-		}
 	}
-
-	return &imageHashMap;
 }
