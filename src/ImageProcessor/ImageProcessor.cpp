@@ -46,7 +46,13 @@ std::string NormalizePathEncoding(std::string imagePath) {
 	using Codecvt = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<Codecvt, wchar_t> converter;
 
-	return converter.to_bytes(buffer);
+	std::string returnString = converter.to_bytes(buffer);
+
+	if (buffer) {
+		delete[] buffer;
+	}
+
+	return returnString;
 }
 
 void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes) {
