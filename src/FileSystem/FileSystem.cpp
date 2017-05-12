@@ -34,12 +34,20 @@ void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::
 	{
 		if (!is_directory(*itr))
 		{
-			std::string filePath = itr->path().extension().string();
-			boost::erase_all(filePath, ".");
-			boost::to_upper(filePath);
+			std::string fileExt = itr->path().extension().string();
+			boost::erase_all(fileExt, ".");
+			boost::to_upper(fileExt);
 
-			if (formatIndex.find(filePath) != formatIndex.end()) {
+			if (formatIndex.find(fileExt) != formatIndex.end()) {
+#if _DEBUG
+				boost::filesystem::path filePath = itr->path();
+				std::string filePathString = filePath.string();
+				std::wstring filePathwString = filePath.wstring();
+				filePaths->push_back(filePath);
+#else
 				filePaths->push_back(itr->path());
+#endif //_DEBUG
+
 			}
 		}
 	}

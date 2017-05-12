@@ -16,7 +16,13 @@ int main(int argc, char* argv[])
 
 	ImageProcessor im1;
 	im1.ReduceToHash(argv[0], &paths, &imageHashes);
-	std::cout << "Finished reducing images" << std::endl;
+	std::cout << std::endl << "Finished reducing images, processed " << imageHashes.size() << " elements" << std::endl << std::endl;
+
+	std::cout << "Computed hashes:" << std::endl;
+	for (auto const& x : imageHashes)
+	{
+		std::cout << "\t" << x.second << "; " << ((boost::filesystem::path)(x.first)).filename() << std::endl;
+	}
 
 	std::string str;
 	std::getline(std::cin, str);
