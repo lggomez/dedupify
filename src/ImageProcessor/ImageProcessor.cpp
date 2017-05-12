@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "ImageProcessor.h"
+#include <Windows.h>
+#include <codecvt>
 
 using namespace std;
 using namespace Magick;
@@ -12,23 +14,39 @@ ImageProcessor::~ImageProcessor()
 {
 }
 
+std::wstring ConvertToLPCWSTR(const std::string& s)
+{
+	ssize_t len;
+	ssize_t slength = (int)s.length() + 1;
+
+	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+	wchar_t* buf = new wchar_t[len];
+
+	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+	std::wstring convertedString(buf);
+	delete[] buf;
+
+	return convertedString;
+}
+
 std::string NormalizePathEncoding(std::string imagePath) {
-	int size = MultiByteToWideChar(CP_ACP, MB_COMPOSITE, imagePath.c_str(),
-		imagePath.length(), nullptr, 0);
-	std::wstring utf16_str(size, '\0');
-	MultiByteToWideChar(CP_ACP, MB_COMPOSITE, imagePath.c_str(),
-		imagePath.length(), &utf16_str[0], size);
+	long     length = 0;
+	wchar_t*   buffer = NULL;
 
-	int utf8_size = WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(),
-		utf16_str.length(), nullptr, 0,
-		nullptr, nullptr);
+	// First obtain the size needed by passing NULL and 0.
+	length = GetShortPathName(ConvertToLPCWSTR(imagePath).c_str(), NULL, 0);
 
-	std::string utf8_str(utf8_size, '\0');
-	WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(),
-		utf16_str.length(), &utf8_str[0], utf8_size,
-		nullptr, nullptr);
+	// Dynamically allocate the correct size 
+	// (terminating null char was included in length)
+	buffer = new wchar_t[length];
 
-	return utf8_str;
+	// Now simply call again using same long path.
+	length = GetShortPathName(ConvertToLPCWSTR(imagePath).c_str(), buffer, length);
+
+	using Codecvt = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<Codecvt, wchar_t> converter;
+
+	return converter.to_bytes(buffer);
 }
 
 void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes) {
