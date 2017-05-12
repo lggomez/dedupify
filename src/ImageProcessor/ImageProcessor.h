@@ -5,8 +5,6 @@
 #include <boost/filesystem/path.hpp>
 #include <ImageMagick\include\Magick++.h>
 #include <ImageMagick\include\Magick++\STL.h>
-#include <ImageMagick\include\MagickCore\MagickCore.h>
-#include <ImageMagick\include\MagickWand\wand.h>
 
 class ImageProcessor
 {
