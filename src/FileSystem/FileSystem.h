@@ -4,7 +4,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
-#include <ImageMagick\include\Magick++.h>
+#include <ImageMagick/include/Magick++.h>
 
 class FileSystem
 {
