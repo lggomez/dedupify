@@ -5,6 +5,7 @@
 #include <boost/filesystem/path.hpp>
 #include <ImageMagick\include\Magick++.h>
 #include <ImageMagick\include\Magick++\STL.h>
+#include <../DeDupify/ThrowAssert.hpp>
 
 class ImageProcessor
 {

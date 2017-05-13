@@ -16,8 +16,8 @@ ImageProcessor::~ImageProcessor()
 
 std::wstring ConvertToLPCWSTR(const std::string& s)
 {
-	ssize_t len;
-	ssize_t slength = (int)s.length() + 1;
+	int len;
+	int slength = (int)s.length() + 1;
 
 	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
 	wchar_t* buf = new wchar_t[len];
@@ -87,7 +87,6 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 					Color nextPixelColor = image.pixelColor(x + 1, y);
 
 					ssize_t index = x*y + x;
-					assert(index < hashSize);
 
 					if (pixelColor.quantumBlue() < nextPixelColor.quantumBlue()) {
 						hash[index] = '1';
