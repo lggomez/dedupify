@@ -69,10 +69,10 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 
 			Magick::Image image(NormalizePathEncoding(imagePath));
 			image.modifyImage();
-			image.resize(Geometry(quantizationSize, quantizationSize -1, quantizationSize, quantizationSize-1));
 			image.quantizeColorSpace(GRAYColorspace);
 			image.quantizeColors(256);
 			image.quantize();
+			image.resize(Geometry(quantizationSize, quantizationSize -1, quantizationSize, quantizationSize-1));
 
 			ssize_t w = image.columns();
 			ssize_t h = image.rows();
