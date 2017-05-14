@@ -38,10 +38,11 @@ int main(int argc, char* argv[])
 		std::cout << "\tListing element(s):" << std::endl;
 		if (imageIndexElement.size() > 1) {
 			std::cout << "\t\t-Image similarity found:" << std::endl;
-		}
-		for (auto const& imageIndexKey : imageIndexElement)
-		{
-			std::cout << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << std::endl;
+
+			for (auto const& imageIndexKey : imageIndexElement)
+			{
+				std::cout << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << std::endl;
+			}
 		}
 	}
 
