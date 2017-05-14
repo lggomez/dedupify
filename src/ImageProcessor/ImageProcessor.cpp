@@ -89,8 +89,9 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 	{
 		try {
 			std::string imagePath = p.string();
+#if _DEBUG
 			cout << "\t Processing image: " << imagePath << std::endl;
-
+#endif
 			Magick::Image image(NormalizePathEncoding(imagePath));
 			image.modifyImage();
 			image.quantizeColorSpace(GRAYColorspace);
