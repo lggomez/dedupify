@@ -5,17 +5,21 @@
 
 int main(int argc, char* argv[])
 {
-	FileSystem ex1;
+	throw_assert((argc > 1), "Invalid argument count");
+	char* filePath = argv[1];
+
+	// Initialization
 	std::vector<boost::filesystem::path> paths;
 	std::map<std::string, char*> imageHashes;
 
-	//Path retrieval
-	ex1.GetImagePaths("c:\\imgtest", &paths);
+	// Path retrieval
+	FileSystem fileSystem;
+	fileSystem.GetImagePaths(filePath, &paths);
 	std::cout << "Found " << paths.size() << " elements" << std::endl;
 
-	//Hash creation
-	ImageProcessor im1;
-	im1.ReduceToHash(argv[0], &paths, &imageHashes);
+	// Hash creation
+	ImageProcessor imageProcessor;
+	imageProcessor.ReduceToHash(argv[0], &paths, &imageHashes);
 	std::cout << std::endl << "Finished reducing images, processed " << imageHashes.size() << " elements" << std::endl << std::endl;
 
 	std::cout << "Computed hashes:" << std::endl;
@@ -24,13 +28,25 @@ int main(int argc, char* argv[])
 		std::cout << "\t" << x.second << "; " << ((boost::filesystem::path)(x.first)).filename() << std::endl;
 	}
 
-	//Hash indexing
+	// Hash indexing
 	std::cout << std::endl << "Generating image index:" << std::endl;
-	//ImageIndexer ii1;
-	//ii1.CreateIndex(imageHashes);
+	ImageIndexer imageIndexer;
+	std::vector<vector<pair<std::string, char*>>> imageIndex = imageIndexer.CreateIndex(imageHashes);
 
-	std::string str;
-	std::getline(std::cin, str);
+	for (auto const& imageIndexElement : imageIndex)
+	{
+		std::cout << "\tListing element(s):" << std::endl;
+		if (imageIndexElement.size() > 1) {
+			std::cout << "\t\t-Image similarity found:" << std::endl;
+		}
+		for (auto const& imageIndexKey : imageIndexElement)
+		{
+			std::cout << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << std::endl;
+		}
+	}
+
+	std::cout << std::endl << "Finished. Press enter to exit" << std::endl;
+	std::getchar();
 	return 0;
 }
 

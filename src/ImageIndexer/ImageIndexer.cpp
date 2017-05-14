@@ -4,6 +4,9 @@
 using namespace std;
 using namespace boost::assign;
 
+const size_t HASH_SIZE = 64;
+const size_t HASH_THRESHOLD = 5;
+
 ImageIndexer::ImageIndexer()
 {
 }
@@ -13,7 +16,7 @@ ImageIndexer::~ImageIndexer()
 }
 
 bool HashesAreSimilar(const char* a, const char* b, const size_t size, const size_t threshold) {
-	throw_assert((threshold >= size), "Invalid threshold, it surprasses the hash size");
+	throw_assert((threshold <= size), "Invalid threshold, it surprasses the hash size");
 	unsigned __int64 returnValue = 1ULL;
 
 	for (size_t i = 0; i < size; i++)
@@ -26,35 +29,45 @@ bool HashesAreSimilar(const char* a, const char* b, const size_t size, const siz
 	return (1ULL << threshold) >= returnValue;
 }
 
-std::vector<vector<pair<std::string, char*>>> ImageIndexer::CreateIndex(const std::map<std::string, char*> imageHashes) {
-	const size_t HASH_SIZE = 64;
-	const size_t HASH_THRESHOLD = 5;
-	std::vector<vector<pair<std::string, char*>>> imageIndex((int)(imageHashes.size() / 2));
+std::vector<vector<pair<std::string, char*>>> ImageIndexer::CreateIndex(std::map<std::string, char*> imageHashes) {
+	std::vector<vector<pair<std::string, char*>>> imageIndex;
 
 	for (auto const& imageHash : imageHashes)
 	{
 		pair<std::string, char*> imageIndexKey = make_pair(imageHash.first, imageHash.second);
 
-		if (imageIndex.size() == 0) { //Initialize index
-			std::vector<pair<std::string, char*>> imageIndexKeyList(1);
+		if (imageIndex.size() == 0) { 
+			// Initialize index with the first hash
+			std::vector<pair<std::string, char*>> imageIndexKeyList;
 			imageIndexKeyList.push_back(imageIndexKey);
 			imageIndex.push_back(imageIndexKeyList);
+
 			continue;
 		}
 
-		for (auto const& imageIndexElement : imageIndex)
-		{ //vector<pair<std::string, char*>>
-			for (auto const& indexKey : imageIndexElement)
-			{ //pair<std::string, char*>
+		// Traverse the index in search of matches in each indexKey lists
+		bool match = false;
+		for (vector<pair<std::string, char*>>& imageIndexElement : imageIndex)
+		{
+			// Traverse each index key from the index element
+			for (pair<std::string, char*> indexKey : imageIndexElement)
+			{
 				if (HashesAreSimilar(indexKey.second, imageIndexKey.second, HASH_SIZE, HASH_THRESHOLD)) {
-					((vector<pair<std::string, char*>>)imageIndexElement).push_back(make_pair(indexKey.first, indexKey.second));
+					// There is a match, so we add the current match to the index element
+					match = true;
+					imageIndexElement.push_back(imageIndexKey);
 					break;
 				}
 			}
+		}
 
-			std::vector<pair<std::string, char*>> imageIndexKeyList2(1);
-			imageIndexKeyList2.push_back(imageIndexKey);
-			imageIndex.push_back(imageIndexKeyList2);
+		if (!match) {
+			// No matches, add the key into its separate index element
+			std::vector<pair<std::string, char*>> imageIndexKeyList;
+			imageIndexKeyList.push_back(imageIndexKey);
+			imageIndex.push_back(imageIndexKeyList);
 		}
 	}
+
+	return imageIndex;
 }

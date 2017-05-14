@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "ImageProcessor.h"
-#include <Windows.h>
-#include <codecvt>
 
 using namespace std;
 using namespace Magick;
@@ -13,6 +11,9 @@ ImageProcessor::ImageProcessor()
 ImageProcessor::~ImageProcessor()
 {
 }
+
+const size_t QUANTIZATION_SIZE = 9;
+const size_t HASH_SIZE = (QUANTIZATION_SIZE - 1) * (QUANTIZATION_SIZE - 1);
 
 std::wstring ConvertToLPCWSTR(const std::string& s)
 {
@@ -55,9 +56,32 @@ std::string NormalizePathEncoding(std::string imagePath) {
 	return returnString;
 }
 
+#if _DEBUG
+void ReduceToHashMock(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes) {
+	char *hash1 = new char[HASH_SIZE + 1];
+	std::fill(hash1, hash1 + HASH_SIZE, '0');
+	hash1[HASH_SIZE] = '\0';
+	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\1.png"), hash1));
+
+	char *hash2 = new char[HASH_SIZE + 1];
+	std::fill(hash2, hash2 + HASH_SIZE, '0');
+	for (size_t i = 1; i <= 7; i++) { hash2[1 * i] = '1'; hash2[2 * i] = '1'; hash2[5 * i] = '1'; hash2[6 * i] = '1'; hash2[7 * i] = '1'; hash2[8 * i] = '1'; }
+	hash2[HASH_SIZE] = '\0';
+	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\2.png"), hash2));
+
+	char *hash3 = new char[HASH_SIZE + 1];
+	std::fill(hash3, hash3 + HASH_SIZE, '0');
+	hash3[HASH_SIZE] = '\0';
+	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\1 edit.png"), hash3));
+}
+#endif
+
 void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes) {
-	ssize_t quantizationSize = 9;
-	ssize_t hashSize = (quantizationSize - 1) * (quantizationSize - 1);
+#if _DEBUG
+	cout << "WARNING: MOCK MODE - Extracted file paths will be ignored" << std::endl;
+	ReduceToHashMock(currentPath, filePaths, imageHashes);
+	return;
+#endif
 
 	InitializeMagick(currentPath.c_str());
 
@@ -72,17 +96,17 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 			image.quantizeColorSpace(GRAYColorspace);
 			image.quantizeColors(256);
 			image.quantize();
-			image.resize(Geometry(quantizationSize, quantizationSize -1, quantizationSize, quantizationSize-1));
+			image.resize(Geometry(QUANTIZATION_SIZE, QUANTIZATION_SIZE -1, QUANTIZATION_SIZE, QUANTIZATION_SIZE-1));
 
 			ssize_t w = image.columns();
 			ssize_t h = image.rows();
 
-			char *hash = new char[hashSize + 1];
-			std::fill(hash, hash + hashSize, '0');
-			hash[hashSize] = '\0';
+			char *hash = new char[HASH_SIZE + 1];
+			std::fill(hash, hash + HASH_SIZE, '0');
+			hash[HASH_SIZE] = '\0';
 			
-			for (ssize_t y = 0; y < quantizationSize; y++) {
-				for (ssize_t x = 0; x < quantizationSize-1; x++) {
+			for (ssize_t y = 0; y < QUANTIZATION_SIZE; y++) {
+				for (ssize_t x = 0; x < QUANTIZATION_SIZE-1; x++) {
 					Color pixelColor = image.pixelColor(x, y);
 					Color nextPixelColor = image.pixelColor(x + 1, y);
 

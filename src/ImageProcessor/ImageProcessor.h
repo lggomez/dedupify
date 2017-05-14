@@ -1,4 +1,5 @@
 #pragma once
+#include <codecvt>
 #include <iostream>
 #include <vector>
 #include <boost/algorithm/string.hpp>

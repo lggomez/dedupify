@@ -12,6 +12,6 @@ class ImageIndexer
 public:
 	ImageIndexer();
 	~ImageIndexer();
-	std::vector<vector<pair<std::string, char*>>> ImageIndexer::CreateIndex(const std::map<std::string, char*> imageHashes);
+	std::vector<vector<pair<std::string, char*>>> ImageIndexer::CreateIndex(std::map<std::string, char*> imageHashes);
 };
 
