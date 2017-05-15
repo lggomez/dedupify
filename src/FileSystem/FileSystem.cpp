@@ -26,6 +26,10 @@ void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::
 		++i;
 	}
 
+	formatIndex.erase("GIF");
+	formatIndex.erase("GIF87");
+	formatIndex.erase("TXT");
+
 	if (!fs::exists(dir_path)) return;
 	fs::recursive_directory_iterator end_itr;
 	for (fs::recursive_directory_iterator itr(dir_path);

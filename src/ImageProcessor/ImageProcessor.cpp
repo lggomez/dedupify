@@ -13,7 +13,7 @@ ImageProcessor::~ImageProcessor()
 }
 
 const size_t QUANTIZATION_SIZE = 9;
-const size_t HASH_SIZE = (QUANTIZATION_SIZE - 1) * (QUANTIZATION_SIZE - 1);
+const size_t HASH_SIZE = ((QUANTIZATION_SIZE - 1) * (QUANTIZATION_SIZE - 1)) * 2;
 
 std::wstring ConvertToLPCWSTR(const std::string& s)
 {
@@ -73,6 +73,25 @@ void ReduceToHashMock(const std::string currentPath, const std::vector<boost::fi
 	std::fill(hash3, hash3 + HASH_SIZE, '0');
 	hash3[HASH_SIZE] = '\0';
 	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\1 edit.png"), hash3));
+
+	char *hash4 = new char[HASH_SIZE + 1];
+	std::fill(hash4, hash4 + HASH_SIZE, '0');
+	hash4[HASH_SIZE] = '\0';
+	hash4[15] = '1'; hash4[25] = '1'; hash4[30] = '1';
+	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\1 edit2.png"), hash4));
+
+	char *hash5 = new char[HASH_SIZE + 1];
+	std::fill(hash5, hash5 + HASH_SIZE, '0');
+	hash5[HASH_SIZE] = '\0';
+	for (size_t i = 1; i <= 5; i++) { hash5[5 * i] = '1'; hash5[3 * i] = '1'; hash5[10 * i] = '1'; hash5[9 * i] = '1'; hash5[12 * i] = '1'; hash5[11 * i] = '1'; }
+	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\3.png"), hash5));
+
+	char *hash6 = new char[HASH_SIZE + 1];
+	std::fill(hash6, hash6 + HASH_SIZE, '0');
+	hash6[HASH_SIZE] = '\0';
+	for (size_t i = 1; i <= 5; i++) { hash6[5 * i] = '1'; hash6[3 * i] = '1'; hash6[10 * i] = '1'; hash6[9 * i] = '1'; hash6[12 * i] = '1'; hash6[11 * i] = '1'; }
+	hash6[15] = '1'; hash6[25] = '1'; hash6[30] = '1';
+	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\3 edit.png"), hash6));
 }
 #endif
 
@@ -97,7 +116,7 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 			image.quantizeColorSpace(GRAYColorspace);
 			image.quantizeColors(256);
 			image.quantize();
-			image.resize(Geometry(QUANTIZATION_SIZE, QUANTIZATION_SIZE -1, QUANTIZATION_SIZE, QUANTIZATION_SIZE-1));
+			image.resize(Geometry(QUANTIZATION_SIZE, QUANTIZATION_SIZE, QUANTIZATION_SIZE, QUANTIZATION_SIZE));
 
 			ssize_t w = image.columns();
 			ssize_t h = image.rows();
@@ -112,6 +131,21 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 					Color nextPixelColor = image.pixelColor(x + 1, y);
 
 					ssize_t index = x*y + x;
+
+					if (pixelColor.quantumBlue() < nextPixelColor.quantumBlue()) {
+						hash[index] = '1';
+					}
+				}
+			}
+
+			int hashOffset = HASH_SIZE / 2;
+
+			for (ssize_t x = 0; x < QUANTIZATION_SIZE; x++) {
+				for (ssize_t y = 0; y < QUANTIZATION_SIZE - 1; y++) {
+					Color pixelColor = image.pixelColor(x, y);
+					Color nextPixelColor = image.pixelColor(x, y + 1);
+
+					ssize_t index = hashOffset + x*y + x;
 
 					if (pixelColor.quantumBlue() < nextPixelColor.quantumBlue()) {
 						hash[index] = '1';

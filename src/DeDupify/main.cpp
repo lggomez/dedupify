@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	// Hash creation
 	ImageProcessor imageProcessor;
 	imageProcessor.ReduceToHash(argv[0], &paths, &imageHashes);
-	std::cout << std::endl << "Finished reducing images, " << imageHashes.size() << " elementsm processed" << std::endl << std::endl;
+	std::cout << std::endl << "Finished reducing images, " << imageHashes.size() << " elements processed" << std::endl << std::endl;
 
 #if _DEBUG
 	std::cout << "Computed hashes:" << std::endl;

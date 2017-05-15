@@ -4,8 +4,8 @@
 using namespace std;
 using namespace boost::assign;
 
-const size_t HASH_SIZE = 64;
-const size_t HASH_THRESHOLD = 5;
+const size_t HASH_SIZE = 128;
+const size_t HASH_THRESHOLD = 3;
 
 ImageIndexer::ImageIndexer()
 {
