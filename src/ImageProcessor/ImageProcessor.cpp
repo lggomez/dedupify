@@ -3,6 +3,7 @@
 
 using namespace std;
 using namespace Magick;
+using namespace MagickCore;
 
 ImageProcessor::ImageProcessor()
 {
@@ -11,9 +12,6 @@ ImageProcessor::ImageProcessor()
 ImageProcessor::~ImageProcessor()
 {
 }
-
-const size_t QUANTIZATION_SIZE = 9;
-const size_t HASH_SIZE = ((QUANTIZATION_SIZE - 1) * (QUANTIZATION_SIZE - 1)) * 2;
 
 std::wstring ConvertToLPCWSTR(const std::string& s)
 {
@@ -117,7 +115,7 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 			image.quantizeColors(256);
 			image.quantize();
 			image.resize(Geometry(QUANTIZATION_SIZE, QUANTIZATION_SIZE, QUANTIZATION_SIZE, QUANTIZATION_SIZE));
-
+			
 			ssize_t w = image.columns();
 			ssize_t h = image.rows();
 
@@ -160,4 +158,56 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 			cout << "Caught exception: " << error_.what() << endl;
 		}
 	}
+}
+
+void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, std::pair<double, unsigned short*>>& imageMagnitudes) {
+	InitializeMagick(currentPath.c_str());
+	ExceptionInfo *exceptionInfo = AcquireExceptionInfo();
+
+	for (const boost::filesystem::path& p : filePaths)
+	{
+		try {
+			std::string imagePath = p.string();
+//#if _DEBUG
+//			cout << "\t Processing image: " << imagePath << std::endl;
+//#endif
+			cout << "\t Processing image: " << imagePath << std::endl;
+			
+			ImageInfo *imageInfo;
+			MagickCore::Image *image;
+
+			exceptionInfo = AcquireExceptionInfo();
+			imageInfo = CloneImageInfo((ImageInfo *)NULL);
+			image = ReadImage(imageInfo, exceptionInfo);
+			image = ResizeImage(image, PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, UndefinedFilter, exceptionInfo);
+			image = ForwardFourierTransformImage(image, MagickTrue, exceptionInfo);
+
+			size_t columns = image->columns;
+			size_t rows = image->rows;
+			size_t imageSize = PRE_TRANSFORM_SIZE * PRE_TRANSFORM_SIZE;
+
+			unsigned short *magnitudes = new unsigned short[imageSize + 1];
+			magnitudes[imageSize] = '\0';
+			double magnitudeMedian = 0.0;
+			unsigned __int64 magnitudeTotal = 0ULL;
+
+			Quantum *pixels = GetAuthenticPixels(image, 0, 0, columns, rows, exceptionInfo);
+
+			for (size_t x = 0; x < columns; ++x) {
+				for (size_t y = 0; y < rows - 1; ++y) {
+					magnitudes[x*y + x] = pixels[x*y + x];
+					magnitudeTotal += pixels[x*y + x];
+				}
+			}
+
+			magnitudeMedian = magnitudeTotal / (double)imageSize;
+			imageMagnitudes[imagePath] = std::pair<double, unsigned short*>(magnitudeMedian, magnitudes);
+		}
+		catch (Exception &error_)
+		{
+			cout << "Caught exception: " << error_.what() << endl;
+		}
+	}
+
+	DestroyExceptionInfo(exceptionInfo);
 }
