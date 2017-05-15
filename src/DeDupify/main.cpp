@@ -14,12 +14,12 @@ int main(int argc, char* argv[])
 
 	// Path retrieval
 	FileSystem fileSystem;
-	fileSystem.GetImagePaths(filePath, &paths);
+	fileSystem.GetImagePaths(filePath, paths);
 	std::cout << "Found " << paths.size() << " elements. Processing" << std::endl;
 
 	// Hash creation
 	ImageProcessor imageProcessor;
-	imageProcessor.ReduceToHash(argv[0], &paths, &imageHashes);
+	imageProcessor.ReduceToHash(argv[0], paths, imageHashes);
 	std::cout << std::endl << "Finished reducing images, " << imageHashes.size() << " elements processed" << std::endl << std::endl;
 
 #if _DEBUG

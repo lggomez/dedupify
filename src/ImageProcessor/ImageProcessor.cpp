@@ -57,45 +57,45 @@ std::string NormalizePathEncoding(std::string imagePath) {
 }
 
 #if _DEBUG
-void ReduceToHashMock(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes) {
+void ReduceToHashMock(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, char*>& imageHashes) {
 	char *hash1 = new char[HASH_SIZE + 1];
 	std::fill(hash1, hash1 + HASH_SIZE, '0');
 	hash1[HASH_SIZE] = '\0';
-	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\1.png"), hash1));
+	imageHashes.insert(std::pair<std::string, char*>(std::string("C:\1.png"), hash1));
 
 	char *hash2 = new char[HASH_SIZE + 1];
 	std::fill(hash2, hash2 + HASH_SIZE, '0');
 	for (size_t i = 1; i <= 7; i++) { hash2[1 * i] = '1'; hash2[2 * i] = '1'; hash2[5 * i] = '1'; hash2[6 * i] = '1'; hash2[7 * i] = '1'; hash2[8 * i] = '1'; }
 	hash2[HASH_SIZE] = '\0';
-	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\2.png"), hash2));
+	imageHashes.insert(std::pair<std::string, char*>(std::string("C:\2.png"), hash2));
 
 	char *hash3 = new char[HASH_SIZE + 1];
 	std::fill(hash3, hash3 + HASH_SIZE, '0');
 	hash3[HASH_SIZE] = '\0';
-	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\1 edit.png"), hash3));
+	imageHashes.insert(std::pair<std::string, char*>(std::string("C:\1 edit.png"), hash3));
 
 	char *hash4 = new char[HASH_SIZE + 1];
 	std::fill(hash4, hash4 + HASH_SIZE, '0');
 	hash4[HASH_SIZE] = '\0';
 	hash4[15] = '1'; hash4[25] = '1'; hash4[30] = '1';
-	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\1 edit2.png"), hash4));
+	imageHashes.insert(std::pair<std::string, char*>(std::string("C:\1 edit2.png"), hash4));
 
 	char *hash5 = new char[HASH_SIZE + 1];
 	std::fill(hash5, hash5 + HASH_SIZE, '0');
 	hash5[HASH_SIZE] = '\0';
 	for (size_t i = 1; i <= 5; i++) { hash5[5 * i] = '1'; hash5[3 * i] = '1'; hash5[10 * i] = '1'; hash5[9 * i] = '1'; hash5[12 * i] = '1'; hash5[11 * i] = '1'; }
-	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\3.png"), hash5));
+	imageHashes.insert(std::pair<std::string, char*>(std::string("C:\3.png"), hash5));
 
 	char *hash6 = new char[HASH_SIZE + 1];
 	std::fill(hash6, hash6 + HASH_SIZE, '0');
 	hash6[HASH_SIZE] = '\0';
 	for (size_t i = 1; i <= 5; i++) { hash6[5 * i] = '1'; hash6[3 * i] = '1'; hash6[10 * i] = '1'; hash6[9 * i] = '1'; hash6[12 * i] = '1'; hash6[11 * i] = '1'; }
 	hash6[15] = '1'; hash6[25] = '1'; hash6[30] = '1';
-	imageHashes->insert(std::pair<std::string, char*>(std::string("C:\3 edit.png"), hash6));
+	imageHashes.insert(std::pair<std::string, char*>(std::string("C:\3 edit.png"), hash6));
 }
 #endif
 
-void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vector<boost::filesystem::path>* filePaths, std::map<std::string, char*>* imageHashes) {
+void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, char*>& imageHashes) {
 #if _DEBUG
 	cout << "WARNING: MOCK MODE - Extracted file paths will be ignored" << std::endl;
 	ReduceToHashMock(currentPath, filePaths, imageHashes);
@@ -104,7 +104,7 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 
 	InitializeMagick(currentPath.c_str());
 
-	for (boost::filesystem::path p : *filePaths)
+	for (const boost::filesystem::path& p : filePaths)
 	{
 		try {
 			std::string imagePath = p.string();
@@ -125,8 +125,8 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 			std::fill(hash, hash + HASH_SIZE, '0');
 			hash[HASH_SIZE] = '\0';
 			
-			for (ssize_t y = 0; y < QUANTIZATION_SIZE; y++) {
-				for (ssize_t x = 0; x < QUANTIZATION_SIZE-1; x++) {
+			for (ssize_t y = 0; y < QUANTIZATION_SIZE; ++y) {
+				for (ssize_t x = 0; x < QUANTIZATION_SIZE-1; ++x) {
 					Color pixelColor = image.pixelColor(x, y);
 					Color nextPixelColor = image.pixelColor(x + 1, y);
 
@@ -140,8 +140,8 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 
 			int hashOffset = HASH_SIZE / 2;
 
-			for (ssize_t x = 0; x < QUANTIZATION_SIZE; x++) {
-				for (ssize_t y = 0; y < QUANTIZATION_SIZE - 1; y++) {
+			for (ssize_t x = 0; x < QUANTIZATION_SIZE; ++x) {
+				for (ssize_t y = 0; y < QUANTIZATION_SIZE - 1; ++y) {
 					Color pixelColor = image.pixelColor(x, y);
 					Color nextPixelColor = image.pixelColor(x, y + 1);
 
@@ -153,7 +153,7 @@ void ImageProcessor::ReduceToHash(const std::string currentPath, const std::vect
 				}
 			}
 
-			imageHashes->insert(std::pair<std::string, char*>(p.string(), hash));
+			imageHashes.insert(std::pair<std::string, char*>(p.string(), hash));
 		}
 		catch (Exception &error_)
 		{

@@ -9,6 +9,9 @@ using namespace std;
 
 class ImageIndexer
 {
+private:
+	const size_t HASH_SIZE = 128;
+	const size_t HASH_THRESHOLD = 3;
 public:
 	ImageIndexer();
 	~ImageIndexer();

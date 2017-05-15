@@ -4,9 +4,6 @@
 using namespace std;
 using namespace boost::assign;
 
-const size_t HASH_SIZE = 128;
-const size_t HASH_THRESHOLD = 3;
-
 ImageIndexer::ImageIndexer()
 {
 }
@@ -19,7 +16,7 @@ bool HashesAreSimilar(const char* a, const char* b, const size_t size, const siz
 	throw_assert((threshold <= size), "Invalid threshold, it surprasses the hash size");
 	unsigned __int64 returnValue = 1ULL;
 
-	for (size_t i = 0; i < size; i++)
+	for (size_t i = 0; i < size; ++i)
 	{
 		if (a[i] - b[i] != 0) {
 			returnValue <<= 1;

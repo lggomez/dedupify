@@ -12,7 +12,7 @@ FileSystem::~FileSystem()
 {
 }
 
-void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::filesystem::path>* filePaths)
+void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::filesystem::path>& filePaths)
 {
 	MagickCore::ExceptionInfo* exceptionInfo = MagickCore::AcquireExceptionInfo();
 	size_t number_formats;
@@ -44,12 +44,12 @@ void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::
 
 			if (formatIndex.find(fileExt) != formatIndex.end()) {
 #if _DEBUG
-				boost::filesystem::path filePath = itr->path();
+				const boost::filesystem::path& filePath = itr->path();
 				std::string filePathString = filePath.string();
 				std::wstring filePathwString = filePath.wstring();
-				filePaths->push_back(filePath);
+				filePaths.push_back(filePath);
 #else
-				filePaths->push_back(itr->path());
+				filePaths.push_back(itr->path());
 #endif //_DEBUG
 
 			}

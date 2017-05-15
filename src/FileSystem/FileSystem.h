@@ -11,6 +11,6 @@ class FileSystem
 public:
 	FileSystem();
 	~FileSystem();
-	void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::filesystem::path>* filePaths);
+	void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::filesystem::path>& filePaths);
 };
 
