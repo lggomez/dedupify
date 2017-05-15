@@ -161,7 +161,7 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 }
 
 void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, std::pair<double, unsigned short*>>& imageMagnitudes) {
-	InitializeMagick(currentPath.c_str());
+	MagickCore::MagickCoreGenesis(currentPath.c_str(), MagickTrue);
 	ExceptionInfo *exceptionInfo = AcquireExceptionInfo();
 
 	for (const boost::filesystem::path& p : filePaths)
@@ -178,6 +178,7 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 
 			exceptionInfo = AcquireExceptionInfo();
 			imageInfo = CloneImageInfo((ImageInfo *)NULL);
+			(void)strcpy_s(imageInfo->filename, p.generic_string().c_str());
 			image = ReadImage(imageInfo, exceptionInfo);
 			image = ResizeImage(image, PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, UndefinedFilter, exceptionInfo);
 			image = ForwardFourierTransformImage(image, MagickTrue, exceptionInfo);
@@ -210,4 +211,5 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 	}
 
 	DestroyExceptionInfo(exceptionInfo);
+	MagickCore::MagickCoreTerminus();
 }
