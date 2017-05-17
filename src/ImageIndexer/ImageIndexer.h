@@ -21,6 +21,6 @@ public:
 	ImageIndexer();
 	~ImageIndexer();
 	std::vector<vector<pair<std::string, char*>>> ImageIndexer::CreateIndex(std::map<std::string, char*> imageHashes);
-	std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTIndex(std::map<std::string, std::pair<double_t, double_t*>>& imageMagnitudes);
+	std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateRankDFTIndex(std::map<std::string, std::pair<double_t, double_t*>>& imageMagnitudes);
 };
 

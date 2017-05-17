@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <iomanip>
 #include "../FileSystem/FileSystem.h"
 #include "../ImageProcessor/ImageProcessor.h"
 #include "../ImageIndexer/ImageIndexer.h"
@@ -32,13 +33,13 @@ void FindMatchesWithQuantizationComparer(int argc, char* argv[], std::vector<boo
 
 			for (auto const& imageIndexKey : imageIndexElement)
 			{
-				std::cout << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << std::endl;
+				std::cout << std::setprecision(20) << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << std::endl;
 			}
 		}
 	}
 }
 
-void FindMatchesWithNarayananDFTComparer(int argc, char* argv[], std::vector<boost::filesystem::path> paths) {
+void FindMatchesWithRankDFTComparer(int argc, char* argv[], std::vector<boost::filesystem::path> paths) {
 	std::map<std::string, std::pair<double_t, double_t*>> imageHashes;
 
 	// Magnitudes creation
@@ -49,7 +50,7 @@ void FindMatchesWithNarayananDFTComparer(int argc, char* argv[], std::vector<boo
 	// Magnitude indexing
 	std::cout << std::endl << "Generating image index:" << std::endl;
 	ImageIndexer imageIndexer;
-	std::vector<std::vector<ImageMagnitudeData>> imageIndex = imageIndexer.CreateNarayananDFTIndex(imageHashes);
+	std::vector<std::vector<ImageMagnitudeData>> imageIndex = imageIndexer.CreateRankDFTIndex(imageHashes);
 
 	std::cout << "\tListing element(s):" << std::endl;
 	for (std::vector<ImageMagnitudeData>& imageIndexElement : imageIndex)
@@ -91,7 +92,7 @@ int main(int argc, char* argv[])
 {
 	std::vector<boost::filesystem::path> paths = init(argc, argv);
 
-	FindMatchesWithNarayananDFTComparer(argc, argv, paths);
+	FindMatchesWithRankDFTComparer(argc, argv, paths);
 
 	end();
 	return 0;
