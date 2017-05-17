@@ -33,14 +33,14 @@ double_t RankDFT(ImageMagnitudeData a, ImageMagnitudeData b, size_t n) {
 	double_t subresult_b = 0.0;
 	double_t subresult_c = 0.0;
 
-	for (size_t i = 0; i < n; i++)
+	for (size_t i = 0; i < n * n; i++)
 	{
 		subresult_a += (a.imageMagnitudes[i] * b.imageMagnitudes[i]) - (n * (a.magnitudeMedian * b.magnitudeMedian));
 		subresult_b += (abs(a.imageMagnitudes[i]) * abs(a.imageMagnitudes[i])) - (n * (a.magnitudeMedian * a.magnitudeMedian));
 		subresult_c += (abs(b.imageMagnitudes[i]) * abs(b.imageMagnitudes[i])) - (n * (b.magnitudeMedian * b.magnitudeMedian));
 	}
 
-	result = 2 - ((subresult_a * subresult_a) / (subresult_b * subresult_c));
+	result = ((subresult_a * subresult_a) / (subresult_b * subresult_c));
 
 	return result;
 }

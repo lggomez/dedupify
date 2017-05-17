@@ -221,7 +221,7 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 			ssize_t h = image.rows();
 			/*DEBUG*/cout << "\t\t Image resized: current size is " << w << "x" << h << std::endl;
 
-			ForwardFourierTransformImage(image.constImage(), MagickCore::MagickTrue, exceptionInfo);
+			image = ForwardFourierTransformImage(image.constImage(), MagickCore::MagickTrue, exceptionInfo);
 			w = image.columns();
 			h = image.rows();
 			///*DEBUG*/cout << "\t\t DFT applied: current size is " << w << "x" << h << std::endl;
@@ -236,12 +236,15 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 			///*DEBUG*/cout << "\t\t Setting magnitudes" << std::endl;
 			for (ssize_t x = 0; x < w; ++x) {
 				for (ssize_t y = 0; y < h; ++y) {
+					Quantum* quantum = image.getPixels(x, y, 1, 1);
+					magnitudes[x*y + y] = *quantum;
+					//totalMagnitude += magnitudes[x*y + y];
 					Color pixelColor = image.pixelColor(x, y);
-					magnitudes[x*y + y] = pixelColor.quantumBlue();
-					totalMagnitude += pixelColor.quantumBlue();
+					totalMagnitude += pixelColor.quantumRed() + pixelColor.quantumGreen() + pixelColor.quantumBlue();
 				}
 			}
 
+			
 			///*DEBUG*/cout << "\t\t Doing final assignments" << imagePath << std::endl;
 			magnitudeMedian = totalMagnitude / (double_t)imageSize;
 			imageMagnitudes[imagePath] = std::pair<double_t, double_t*>(magnitudeMedian, magnitudes);
