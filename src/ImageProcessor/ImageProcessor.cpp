@@ -145,11 +145,11 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 			hash[HASH_SIZE] = '\0';
 			
 			for (ssize_t y = 0; y < QUANTIZATION_SIZE; ++y) {
-				for (ssize_t x = 0; x < QUANTIZATION_SIZE-1; ++x) {
+				for (ssize_t x = 0; x < QUANTIZATION_SIZE - 1; ++x) {
 					Color pixelColor = image.pixelColor(x, y);
 					Color nextPixelColor = image.pixelColor(x + 1, y);
 
-					ssize_t index = x*y + x;
+					ssize_t index = x*y + y;
 
 					if (pixelColor.quantumBlue() < nextPixelColor.quantumBlue()) {
 						hash[index] = '1';
@@ -164,7 +164,7 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 					Color pixelColor = image.pixelColor(x, y);
 					Color nextPixelColor = image.pixelColor(x, y + 1);
 
-					ssize_t index = hashOffset + x*y + x;
+					ssize_t index = hashOffset + x*y + y;
 
 					if (pixelColor.quantumBlue() < nextPixelColor.quantumBlue()) {
 						hash[index] = '1';
@@ -235,9 +235,9 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 
 			///*DEBUG*/cout << "\t\t Setting magnitudes" << std::endl;
 			for (ssize_t x = 0; x < w; ++x) {
-				for (ssize_t y = 0; y < h - 1; ++y) {
+				for (ssize_t y = 0; y < h; ++y) {
 					Color pixelColor = image.pixelColor(x, y);
-					magnitudes[x*y + x] = pixelColor.quantumBlue();
+					magnitudes[x*y + y] = pixelColor.quantumBlue();
 					totalMagnitude += pixelColor.quantumBlue();
 				}
 			}
