@@ -26,7 +26,6 @@ bool HashesAreSimilar(const char* a, const char* b, const size_t size, const siz
 	return (1ULL << threshold) >= returnValue;
 }
 
-#pragma optimize( "", off )  
 double_t RankDFT(ImageMagnitudeData a, ImageMagnitudeData b, size_t n) {
 	double_t result = 0.0;
 	double_t subresult_a = 0.0;
@@ -136,4 +135,3 @@ std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTInd
 
 	return imageIndex;
 }
-#pragma optimize( "", on )
