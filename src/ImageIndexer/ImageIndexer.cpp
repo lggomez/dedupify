@@ -26,20 +26,21 @@ bool HashesAreSimilar(const char* a, const char* b, const size_t size, const siz
 	return (1ULL << threshold) >= returnValue;
 }
 
-double NarayananDistance(ImageMagnitudeData a, ImageMagnitudeData b, size_t n) {
-	double result = 0.0;
-	double subresult_a = 0.0;
-	double subresult_b = 0.0;
-	double subresult_c = 0.0;
+#pragma optimize( "", off )  
+double_t RankDFT(ImageMagnitudeData a, ImageMagnitudeData b, size_t n) {
+	double_t result = 0.0;
+	double_t subresult_a = 0.0;
+	double_t subresult_b = 0.0;
+	double_t subresult_c = 0.0;
 
 	for (size_t i = 0; i < n; i++)
 	{
 		subresult_a += (a.imageMagnitudes[i] * b.imageMagnitudes[i]) - (n * (a.magnitudeMedian * b.magnitudeMedian));
-		subresult_c += (abs(a.imageMagnitudes[i]) * abs(a.imageMagnitudes[i])) - (n * (a.magnitudeMedian * a.magnitudeMedian));
+		subresult_b += (abs(a.imageMagnitudes[i]) * abs(a.imageMagnitudes[i])) - (n * (a.magnitudeMedian * a.magnitudeMedian));
 		subresult_c += (abs(b.imageMagnitudes[i]) * abs(b.imageMagnitudes[i])) - (n * (b.magnitudeMedian * b.magnitudeMedian));
 	}
 
-	result = (subresult_a * subresult_a) / (subresult_b * subresult_c);
+	result = 2 - ((subresult_a * subresult_a) / (subresult_b * subresult_c));
 
 	return result;
 }
@@ -87,7 +88,7 @@ std::vector<vector<pair<std::string, char*>>> ImageIndexer::CreateIndex(std::map
 	return imageIndex;
 }
 
-std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTIndex(std::map<std::string, std::pair<double, unsigned short*>>& imageMagnitudes) {
+std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTIndex(std::map<std::string, std::pair<double_t, double_t*>>& imageMagnitudes) {
 	std::vector<std::vector<ImageMagnitudeData>> imageIndex;
 
 	for (auto const& imageMagnitudeData : imageMagnitudes)
@@ -101,6 +102,7 @@ std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTInd
 		if (imageIndex.size() == 0) {
 			// Initialize index with the first hash
 			std::vector<ImageMagnitudeData> imageIndexKeyList;
+			imageData.distance = 1;
 			imageIndexKeyList.push_back(imageData);
 			imageIndex.push_back(imageIndexKeyList);
 
@@ -112,12 +114,13 @@ std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTInd
 		for (std::vector<ImageMagnitudeData>& imageIndexElement : imageIndex)
 		{
 			// Traverse each index key from the index element
-			for (ImageMagnitudeData imageMagnitudeData : imageIndexElement)
+			for (ImageMagnitudeData& imageMagnitudeData : imageIndexElement)
 			{
-				if (NarayananDistance(imageData, imageMagnitudeData, DFT_IMAGE_SIZE) > 0.9) {
+				imageData.distance = RankDFT(imageData, imageMagnitudeData, DFT_IMAGE_SIZE);
+				if (imageData.distance > 0.9) {
 					// There is a match, so we add the current match to the index element
 					match = true;
-					imageIndexElement.push_back(imageMagnitudeData);
+					imageIndexElement.push_back(imageData);
 					break;
 				}
 			}
@@ -133,3 +136,4 @@ std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTInd
 
 	return imageIndex;
 }
+#pragma optimize( "", on )

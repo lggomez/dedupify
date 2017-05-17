@@ -10,9 +10,9 @@ using namespace std;
 
 struct ImageMagnitudeData {
 	std::string filePath;
-	double distance;
-	double magnitudeMedian;
-	unsigned short* imageMagnitudes;
+	double_t distance;
+	double_t magnitudeMedian;
+	double_t* imageMagnitudes;
 };
 
 class __declspec(dllexport) ImageIndexer
@@ -21,6 +21,6 @@ public:
 	ImageIndexer();
 	~ImageIndexer();
 	std::vector<vector<pair<std::string, char*>>> ImageIndexer::CreateIndex(std::map<std::string, char*> imageHashes);
-	std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTIndex(std::map<std::string, std::pair<double, unsigned short*>>& imageMagnitudes);
+	std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateNarayananDFTIndex(std::map<std::string, std::pair<double_t, double_t*>>& imageMagnitudes);
 };
 

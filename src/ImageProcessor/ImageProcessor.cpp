@@ -104,12 +104,31 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 
 	for (const boost::filesystem::path& p : filePaths)
 	{
+		std::string imagePath = p.string();
+		cout << "\t Opening image: " << imagePath << std::endl;
+		auto normalizedPath = NormalizePathEncoding(imagePath);
+		Magick::Image image;
+
 		try {
-			std::string imagePath = p.string();
-#if _DEBUG
-			cout << "\t Processing image: " << imagePath << std::endl;
-#endif
-			Magick::Image image(NormalizePathEncoding(imagePath));
+			Magick::Image subimage(imagePath);
+			image = subimage;
+		}
+		catch (Exception &error_)
+		{
+			try {
+				Magick::Image subimage(normalizedPath);
+				image = subimage;
+			}
+			catch (Exception &suberror_)
+			{
+				cout << "Could not open image: " << error_.what() << endl;
+				continue;
+			}
+		}
+
+		try {
+			///*DEBUG*/cout << "\t\t Image opened" << std::endl;
+
 			image.modifyImage();
 			image.quantizeColorSpace(GRAYColorspace);
 			image.quantizeColors(256);
@@ -162,8 +181,8 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 	}
 }
 
-void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, std::pair<double, unsigned short*>>& imageMagnitudes) {
-	MagickCore::MagickCoreGenesis(currentPath.c_str(), MagickTrue);
+void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, std::pair<double_t, double_t*>>& imageMagnitudes) {
+	MagickCore::MagickCoreGenesis(currentPath.c_str(), MagickCore::MagickTrue);
 	InitializeMagick(currentPath.c_str());
 	ExceptionInfo *exceptionInfo = AcquireExceptionInfo();
 
@@ -202,21 +221,21 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 			ssize_t h = image.rows();
 			/*DEBUG*/cout << "\t\t Image resized: current size is " << w << "x" << h << std::endl;
 
-			ForwardFourierTransformImage(image.constImage(), MagickTrue, exceptionInfo);
+			ForwardFourierTransformImage(image.constImage(), MagickCore::MagickTrue, exceptionInfo);
 			w = image.columns();
 			h = image.rows();
 			///*DEBUG*/cout << "\t\t DFT applied: current size is " << w << "x" << h << std::endl;
-			size_t imageSize = w * h;
+			ssize_t imageSize = w * h;
 
 			///*DEBUG*/cout << "\t\t Initializing magnitudes" << std::endl;
-			unsigned short *magnitudes = new unsigned short[imageSize + 1];
+			double_t *magnitudes = new double_t[imageSize + 1];
 			magnitudes[imageSize] = '\0';
-			double magnitudeMedian = 0.0;
-			unsigned __int64 totalMagnitude = 0ULL;
+			double_t magnitudeMedian = 0.0;
+			double_t totalMagnitude = 0.0;
 
 			///*DEBUG*/cout << "\t\t Setting magnitudes" << std::endl;
-			for (size_t x = 0; x < w; ++x) {
-				for (size_t y = 0; y < h - 1; ++y) {
+			for (ssize_t x = 0; x < w; ++x) {
+				for (ssize_t y = 0; y < h - 1; ++y) {
 					Color pixelColor = image.pixelColor(x, y);
 					magnitudes[x*y + x] = pixelColor.quantumBlue();
 					totalMagnitude += pixelColor.quantumBlue();
@@ -224,8 +243,8 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 			}
 
 			///*DEBUG*/cout << "\t\t Doing final assignments" << imagePath << std::endl;
-			magnitudeMedian = totalMagnitude / (double)imageSize;
-			imageMagnitudes[imagePath] = std::pair<double, unsigned short*>(magnitudeMedian, magnitudes);
+			magnitudeMedian = totalMagnitude / (double_t)imageSize;
+			imageMagnitudes[imagePath] = std::pair<double_t, double_t*>(magnitudeMedian, magnitudes);
 
 			///*DEBUG*/cout << "\t\t Magnitude median: " << magnitudeMedian << std::endl;
 		}

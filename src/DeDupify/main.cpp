@@ -39,7 +39,7 @@ void FindMatchesWithQuantizationComparer(int argc, char* argv[], std::vector<boo
 }
 
 void FindMatchesWithNarayananDFTComparer(int argc, char* argv[], std::vector<boost::filesystem::path> paths) {
-	std::map<std::string, std::pair<double, unsigned short*>> imageHashes;
+	std::map<std::string, std::pair<double_t, double_t*>> imageHashes;
 
 	// Magnitudes creation
 	ImageProcessor imageProcessor;
@@ -52,12 +52,12 @@ void FindMatchesWithNarayananDFTComparer(int argc, char* argv[], std::vector<boo
 	std::vector<std::vector<ImageMagnitudeData>> imageIndex = imageIndexer.CreateNarayananDFTIndex(imageHashes);
 
 	std::cout << "\tListing element(s):" << std::endl;
-	for (auto const& imageIndexElement : imageIndex)
+	for (std::vector<ImageMagnitudeData>& imageIndexElement : imageIndex)
 	{
 		if (imageIndexElement.size() > 1) {
 			std::cout << "\t\t-Image similarity found:" << std::endl;
 
-			for (auto const& imageIndexKey : imageIndexElement)
+			for (ImageMagnitudeData& imageIndexKey : imageIndexElement)
 			{
 				std::cout << "\t\t" << imageIndexKey.distance << " - " << imageIndexKey.filePath << std::endl;
 			}
