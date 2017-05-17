@@ -16,6 +16,7 @@ void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::
 {
 	MagickCore::ExceptionInfo* exceptionInfo = MagickCore::AcquireExceptionInfo();
 	size_t number_formats;
+
 	char** formats = MagickCore::GetMagickList("*", &number_formats, exceptionInfo);
 	map<std::string, bool> formatIndex;
 

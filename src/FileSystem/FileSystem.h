@@ -6,7 +6,7 @@
 #include <boost/filesystem/path.hpp>
 #include <ImageMagick/include/Magick++.h>
 
-class FileSystem
+class  __declspec(dllexport) FileSystem
 {
 public:
 	FileSystem();

@@ -9,7 +9,7 @@
 #include <ImageMagick\include\MagickCore\MagickCore.h>
 #include <../DeDupify/constants.hpp>
 
-class ImageProcessor
+class __declspec(dllexport) ImageProcessor
 {
 public:
 	ImageProcessor();

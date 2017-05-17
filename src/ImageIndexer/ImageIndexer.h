@@ -15,7 +15,7 @@ struct ImageMagnitudeData {
 	unsigned short* imageMagnitudes;
 };
 
-class ImageIndexer
+class __declspec(dllexport) ImageIndexer
 {
 public:
 	ImageIndexer();

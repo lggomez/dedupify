@@ -51,7 +51,7 @@
   the built ImageMagick to any directory on any directory on any machine,
   then do not use this setting.
 */
-#define MAGICKCORE_INSTALLED_SUPPORT
+//#define MAGICKCORE_INSTALLED_SUPPORT
 
 /*
   Specify size of PixelPacket color Quantums (8, 16, or 32).
@@ -63,7 +63,7 @@
 /*
   Define to enable high dynamic range imagery (HDRI)
 */
-#define MAGICKCORE_HDRI_ENABLE 0
+#define MAGICKCORE_HDRI_ENABLE 1
 
 /*
   Define to enable OpenCL
@@ -74,7 +74,7 @@
 /*
     Exclude deprecated methods in MagickCore API
 */
-//#define MAGICKCORE_EXCLUDE_DEPRECATED
+#define MAGICKCORE_EXCLUDE_DEPRECATED
 
 /*
   Define to use the bzip2 compression library

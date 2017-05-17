@@ -167,41 +167,40 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 	for (const boost::filesystem::path& p : filePaths)
 	{
 		try {
+			InitializeMagick(currentPath.c_str());
+
 			std::string imagePath = p.string();
-//#if _DEBUG
-//			cout << "\t Processing image: " << imagePath << std::endl;
-//#endif
+			//#if _DEBUG
+			//   cout << "\t Processing image: " << imagePath << std::endl;
+			//#endif
 			cout << "\t Processing image: " << imagePath << std::endl;
-			
-			ImageInfo *imageInfo;
-			MagickCore::Image *image;
+			auto normalized = NormalizePathEncoding(imagePath);
+			Magick::Image image(imagePath);
+			//Magick::Image image(imagePath);
+			image.modifyImage();
+			image.resize(Geometry(PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE));
 
-			exceptionInfo = AcquireExceptionInfo();
-			imageInfo = CloneImageInfo((ImageInfo *)NULL);
-			(void)strcpy_s(imageInfo->filename, p.generic_string().c_str());
-			image = ReadImage(imageInfo, exceptionInfo);
-			image = ResizeImage(image, PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, UndefinedFilter, exceptionInfo);
-			image = ForwardFourierTransformImage(image, MagickTrue, exceptionInfo);
+			ssize_t w = image.columns();
+			ssize_t h = image.rows();
 
-			size_t columns = image->columns;
-			size_t rows = image->rows;
+			ForwardFourierTransformImage(image.constImage(), MagickTrue, exceptionInfo);
+			//ASSERT(exceptionInfo->)
 			size_t imageSize = PRE_TRANSFORM_SIZE * PRE_TRANSFORM_SIZE;
 
 			unsigned short *magnitudes = new unsigned short[imageSize + 1];
 			magnitudes[imageSize] = '\0';
 			double magnitudeMedian = 0.0;
-			unsigned __int64 magnitudeTotal = 0ULL;
+			unsigned __int64 totalMagnitude = 0ULL;
 
-			Quantum *pixels = GetAuthenticPixels(image, 0, 0, columns, rows, exceptionInfo);
-
-			for (size_t x = 0; x < columns; ++x) {
-				for (size_t y = 0; y < rows - 1; ++y) {
-					magnitudes[x*y + x] = pixels[x*y + x];
-					magnitudeTotal += pixels[x*y + x];
+			for (size_t x = 0; x < w; ++x) {
+				for (size_t y = 0; y < h - 1; ++y) {
+					Color pixelColor = image.pixelColor(x, y);
+					magnitudes[x*y + x] = pixelColor.quantumBlue();
+					totalMagnitude += pixelColor.quantumBlue();
 				}
 			}
 
-			magnitudeMedian = magnitudeTotal / (double)imageSize;
+			magnitudeMedian = totalMagnitude / (double)imageSize;
 			imageMagnitudes[imagePath] = std::pair<double, unsigned short*>(magnitudeMedian, magnitudes);
 		}
 		catch (Exception &error_)
