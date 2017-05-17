@@ -33,7 +33,7 @@ void FindMatchesWithQuantizationComparer(int argc, char* argv[], std::vector<boo
 
 			for (auto const& imageIndexKey : imageIndexElement)
 			{
-				std::cout << std::setprecision(20) << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << std::endl;
+				std::cout << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << std::endl;
 			}
 		}
 	}
@@ -60,6 +60,8 @@ void FindMatchesWithRankDFTComparer(int argc, char* argv[], std::vector<boost::f
 
 			for (ImageMagnitudeData& imageIndexKey : imageIndexElement)
 			{
+				cout << fixed << showpoint;
+				cout << setprecision(10);
 				std::cout << "\t\t" << imageIndexKey.distance << " - " << imageIndexKey.filePath << std::endl;
 			}
 		}
