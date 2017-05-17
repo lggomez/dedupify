@@ -61,7 +61,7 @@ void FindMatchesWithRankDFTComparer(int argc, char* argv[], std::vector<boost::f
 			for (ImageMagnitudeData& imageIndexKey : imageIndexElement)
 			{
 				cout << fixed << showpoint;
-				cout << setprecision(10);
+				cout << setprecision(20);
 				std::cout << "\t\t" << imageIndexKey.distance << " - " << imageIndexKey.filePath << std::endl;
 			}
 		}
