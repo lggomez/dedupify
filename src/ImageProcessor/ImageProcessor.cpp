@@ -114,7 +114,9 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 			image.quantizeColorSpace(GRAYColorspace);
 			image.quantizeColors(256);
 			image.quantize();
-			image.resize(Geometry(QUANTIZATION_SIZE, QUANTIZATION_SIZE, QUANTIZATION_SIZE, QUANTIZATION_SIZE));
+			Geometry newSize = Geometry(QUANTIZATION_SIZE, QUANTIZATION_SIZE, 0, 0);
+			newSize.aspect(true);
+			image.resize(newSize);
 			
 			ssize_t w = image.columns();
 			ssize_t h = image.rows();
@@ -162,36 +164,57 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 
 void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, std::pair<double, unsigned short*>>& imageMagnitudes) {
 	MagickCore::MagickCoreGenesis(currentPath.c_str(), MagickTrue);
+	InitializeMagick(currentPath.c_str());
 	ExceptionInfo *exceptionInfo = AcquireExceptionInfo();
 
 	for (const boost::filesystem::path& p : filePaths)
 	{
+		std::string imagePath = p.string();
+		cout << "\t Opening image: " << imagePath << std::endl;
+		auto normalizedPath = NormalizePathEncoding(imagePath);
+		Magick::Image image;
+		
 		try {
-			InitializeMagick(currentPath.c_str());
+			Magick::Image subimage(imagePath);
+			image = subimage;
+		}
+		catch (Exception &error_)
+		{
+			try {
+				Magick::Image subimage(normalizedPath);
+				image = subimage;
+			}
+			catch (Exception &suberror_)
+			{
+				cout << "Could not open image: " << error_.what() << endl;
+				continue;
+			}
+		}
 
-			std::string imagePath = p.string();
-			//#if _DEBUG
-			//   cout << "\t Processing image: " << imagePath << std::endl;
-			//#endif
-			cout << "\t Processing image: " << imagePath << std::endl;
-			auto normalized = NormalizePathEncoding(imagePath);
-			Magick::Image image(imagePath);
-			//Magick::Image image(imagePath);
+		try {
+			///*DEBUG*/cout << "\t\t Image opened" << std::endl;
+
 			image.modifyImage();
-			image.resize(Geometry(PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE));
-
+			Geometry newSize = Geometry(PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, 0, 0);
+			newSize.aspect(true);
+			image.resize(newSize);
 			ssize_t w = image.columns();
 			ssize_t h = image.rows();
+			/*DEBUG*/cout << "\t\t Image resized: current size is " << w << "x" << h << std::endl;
 
 			ForwardFourierTransformImage(image.constImage(), MagickTrue, exceptionInfo);
-			//ASSERT(exceptionInfo->)
-			size_t imageSize = PRE_TRANSFORM_SIZE * PRE_TRANSFORM_SIZE;
+			w = image.columns();
+			h = image.rows();
+			///*DEBUG*/cout << "\t\t DFT applied: current size is " << w << "x" << h << std::endl;
+			size_t imageSize = w * h;
 
+			///*DEBUG*/cout << "\t\t Initializing magnitudes" << std::endl;
 			unsigned short *magnitudes = new unsigned short[imageSize + 1];
 			magnitudes[imageSize] = '\0';
 			double magnitudeMedian = 0.0;
 			unsigned __int64 totalMagnitude = 0ULL;
 
+			///*DEBUG*/cout << "\t\t Setting magnitudes" << std::endl;
 			for (size_t x = 0; x < w; ++x) {
 				for (size_t y = 0; y < h - 1; ++y) {
 					Color pixelColor = image.pixelColor(x, y);
@@ -200,8 +223,11 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 				}
 			}
 
+			///*DEBUG*/cout << "\t\t Doing final assignments" << imagePath << std::endl;
 			magnitudeMedian = totalMagnitude / (double)imageSize;
 			imageMagnitudes[imagePath] = std::pair<double, unsigned short*>(magnitudeMedian, magnitudes);
+
+			///*DEBUG*/cout << "\t\t Magnitude median: " << magnitudeMedian << std::endl;
 		}
 		catch (Exception &error_)
 		{
