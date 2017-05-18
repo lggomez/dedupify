@@ -10,8 +10,9 @@
 #include <ImageMagick\include\Magick++.h>
 #include <ImageMagick\include\Magick++\STL.h>
 #include <ImageMagick\include\MagickCore\MagickCore.h>
-#include <../DeDupify/constants.hpp>
 #include <../External/fttw/include/fftw3.h>
+#include <../DeDupify/constants.hpp>
+#include <../DeDupify/structs.h>
 
 class __declspec(dllexport) ImageProcessor
 {

@@ -53,7 +53,7 @@ string NormalizePathEncoding(string imagePath) {
 	return returnString;
 }
 
-void fft(size_t squareSize, PixelPacket* pixels, PixelPacket* outMag, PixelPacket* outPhase)
+void ApplyDiscreteFourierTransform(size_t squareSize, Magick::Image *pixels, Magick::Image* outMag, Magick::Image* outPhase)
 {
 	fftw_plan planR, planG, planB;
 	fftw_complex *inR, *inG, *inB, *outR, *outG, *outB;
@@ -75,10 +75,12 @@ void fft(size_t squareSize, PixelPacket* pixels, PixelPacket* outMag, PixelPacke
 
 	// assign values to real parts (values between 0 and MaxRGB)
 	for (int i = 0; i < squareSize * squareSize; i++) {
-		PixelPacket current = *(pixels + i);
-		double_t red = current.red;
-		double_t green = current.green;
-		double_t blue = current.blue;
+		size_t index_x = floor(i / DFT_IMAGE_WIDTH);
+		size_t index_y = floor(i % DFT_IMAGE_WIDTH);
+		Color pixelColor = pixels->pixelColor(index_x, index_y);
+		double_t red = pixelColor.quantumRed();
+		double_t green = pixelColor.quantumGreen();
+		double_t blue = pixelColor.quantumBlue();
 
 		// save as real numbers
 		inR[i][0] = red;
@@ -109,9 +111,10 @@ void fft(size_t squareSize, PixelPacket* pixels, PixelPacket* outMag, PixelPacke
 		double_t magB = sqrt((realB * realB) + (imagB * imagB));
 
 		// write to output
-		(*(outMag + i)).red = magR;
-		(*(outMag + i)).green = magG;
-		(*(outMag + i)).blue = magB;
+		ssize_t index_x = floor(i / DFT_IMAGE_WIDTH);
+		ssize_t index_y = floor(i % DFT_IMAGE_WIDTH);
+		Magick::Color color1(magR, magG, magB);
+		outMag->pixelColor(index_x, index_y, color1);
 
 		// std::complex for arg()
 		complex<double_t> cR(realR, imagR);
@@ -124,9 +127,8 @@ void fft(size_t squareSize, PixelPacket* pixels, PixelPacket* outMag, PixelPacke
 		double_t phaseB = arg(cB) + M_PI;
 
 		// scale and write to output
-		(*(outPhase + i)).red = (phaseR / (double_t)(2 * M_PI)) * MAX_RGB;
-		(*(outPhase + i)).green = (phaseG / (double_t)(2 * M_PI)) * MAX_RGB;
-		(*(outPhase + i)).blue = (phaseB / (double_t)(2 * M_PI)) * MAX_RGB;
+		Magick::Color color2((phaseR / (double_t)(2 * M_PI)) * MAX_RGB, (phaseG / (double_t)(2 * M_PI)) * MAX_RGB, (phaseB / (double_t)(2 * M_PI)) * MAX_RGB);
+		outPhase->pixelColor(index_x, index_y, color2);
 	}
 
 	// free memory
@@ -298,8 +300,17 @@ void ImageProcessor::ReduceWithDFT(const string& currentPath, const vector<boost
 			image.modifyImage();
 			Geometry newSize = Geometry(DFT_IMAGE_WIDTH, DFT_IMAGE_WIDTH, 0, 0);
 			newSize.aspect(true);
-			image.resize(newSize);
-			image = ForwardFourierTransformImage(image.constImage(), MagickTrue, exceptionInfo);
+			image.extent(newSize);
+
+			Magick::Color black(0, 0, 0);
+			Magick::Image mag(newSize, black);
+			Magick::Image phase(newSize, black);
+			mag.modifyImage();
+			phase.modifyImage();
+
+			// perform fft
+			ApplyDiscreteFourierTransform(DFT_IMAGE_WIDTH, &image, &mag, &phase);
+
 
 			///*DEBUG*/cout << "\t\t DFT applied: current size is " << w << "x" << h << std::endl;
 			size_t imageSize = DFT_IMAGE_HEIGHT * DFT_IMAGE_WIDTH;

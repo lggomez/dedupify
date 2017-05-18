@@ -5,15 +5,9 @@
 #include <boost/algorithm/string.hpp>
 #include <../DeDupify/ThrowAssert.hpp>
 #include <../DeDupify/constants.hpp>
+#include <../DeDupify/structs.h>
 
 using namespace std;
-
-struct ImageMagnitudeData {
-	string filePath;
-	double_t distance;
-	double_t magnitudeMedian;
-	double_t* imageMagnitudes;
-};
 
 class __declspec(dllexport) ImageIndexer
 {
