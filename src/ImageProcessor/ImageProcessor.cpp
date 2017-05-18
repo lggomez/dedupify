@@ -53,6 +53,91 @@ string NormalizePathEncoding(string imagePath) {
 	return returnString;
 }
 
+void fft(size_t squareSize, PixelPacket* pixels, PixelPacket* outMag, PixelPacket* outPhase)
+{
+	fftw_plan planR, planG, planB;
+	fftw_complex *inR, *inG, *inB, *outR, *outG, *outB;
+
+	// allocate input arrays
+	inR = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize);
+	inG = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize);
+	inB = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize);
+
+	// allocate output arrays
+	outR = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize);
+	outG = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize);
+	outB = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize);
+
+	// create plans
+	planR = fftw_plan_dft_2d(squareSize, squareSize, inR, outR, FFTW_FORWARD, FFTW_ESTIMATE);
+	planG = fftw_plan_dft_2d(squareSize, squareSize, inG, outG, FFTW_FORWARD, FFTW_ESTIMATE);
+	planB = fftw_plan_dft_2d(squareSize, squareSize, inB, outB, FFTW_FORWARD, FFTW_ESTIMATE);
+
+	// assign values to real parts (values between 0 and MaxRGB)
+	for (int i = 0; i < squareSize * squareSize; i++) {
+		PixelPacket current = *(pixels + i);
+		double_t red = current.red;
+		double_t green = current.green;
+		double_t blue = current.blue;
+
+		// save as real numbers
+		inR[i][0] = red;
+		inG[i][0] = green;
+		inB[i][0] = blue;
+	}
+
+	// perform FORWARD fft
+	fftw_execute(planR);
+	fftw_execute(planG);
+	fftw_execute(planB);
+
+	// transform imaginary number to phase and magnitude and save to output
+	for (size_t i = 0; i < squareSize * squareSize; i++) {
+		// normalize values
+		double_t realR = outR[i][0] / (double_t)(squareSize * squareSize);
+		double_t imagR = outR[i][1] / (double_t)(squareSize * squareSize);
+
+		double_t realG = outG[i][0] / (double_t)(squareSize * squareSize);
+		double_t imagG = outG[i][1] / (double_t)(squareSize * squareSize);
+
+		double_t realB = outB[i][0] / (double_t)(squareSize * squareSize);
+		double_t imagB = outB[i][1] / (double_t)(squareSize * squareSize);
+
+		// magnitude
+		double_t magR = sqrt((realR * realR) + (imagR * imagR));
+		double_t magG = sqrt((realG * realG) + (imagG * imagG));
+		double_t magB = sqrt((realB * realB) + (imagB * imagB));
+
+		// write to output
+		(*(outMag + i)).red = magR;
+		(*(outMag + i)).green = magG;
+		(*(outMag + i)).blue = magB;
+
+		// std::complex for arg()
+		complex<double_t> cR(realR, imagR);
+		complex<double_t> cG(realG, imagG);
+		complex<double_t> cB(realB, imagB);
+
+		// phase
+		double_t phaseR = arg(cR) + M_PI;
+		double_t phaseG = arg(cG) + M_PI;
+		double_t phaseB = arg(cB) + M_PI;
+
+		// scale and write to output
+		(*(outPhase + i)).red = (phaseR / (double_t)(2 * M_PI)) * MAX_RGB;
+		(*(outPhase + i)).green = (phaseG / (double_t)(2 * M_PI)) * MAX_RGB;
+		(*(outPhase + i)).blue = (phaseB / (double_t)(2 * M_PI)) * MAX_RGB;
+	}
+
+	// free memory
+	fftw_destroy_plan(planR);
+	fftw_destroy_plan(planG);
+	fftw_destroy_plan(planB);
+	fftw_free(inR); fftw_free(outR);
+	fftw_free(inG); fftw_free(outG);
+	fftw_free(inB); fftw_free(outB);
+}
+
 #if _DEBUG
 void ReduceToHashMock(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, char*>& imageHashes) {
 	char *hash1 = new char[HASH_SIZE + 1];

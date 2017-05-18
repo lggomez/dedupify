@@ -1,13 +1,17 @@
 #pragma once
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <codecvt>
 #include <iostream>
 #include <vector>
+#include <complex>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/path.hpp>
 #include <ImageMagick\include\Magick++.h>
 #include <ImageMagick\include\Magick++\STL.h>
 #include <ImageMagick\include\MagickCore\MagickCore.h>
 #include <../DeDupify/constants.hpp>
+#include <../External/fttw/include/fftw3.h>
 
 class __declspec(dllexport) ImageProcessor
 {

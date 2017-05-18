@@ -68,7 +68,6 @@ void FindMatchesWithRankDFTComparer(char* argv[], vector<boost::filesystem::path
 	}
 }
 
-
 vector<boost::filesystem::path> init(int argc, char* argv[]) {
 	throw_assert( argc > 1, "Invalid argument count");
 	char* filePath = argv[1];
