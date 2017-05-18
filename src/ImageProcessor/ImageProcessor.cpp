@@ -13,27 +13,26 @@ ImageProcessor::~ImageProcessor()
 {
 }
 
-std::wstring ConvertToLPCWSTR(const std::string& s)
+wstring ConvertToLPCWSTR(const string& s)
 {
-	int len;
-	int slength = (int)s.length() + 1;
+	int slength = static_cast<int>(s.length()) + 1;
 
-	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+	int len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
 	wchar_t* buf = new wchar_t[len];
 
 	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
-	std::wstring convertedString(buf);
+	wstring convertedString(buf);
 	delete[] buf;
 
 	return convertedString;
 }
 
-std::string NormalizePathEncoding(std::string imagePath) {
-	long     length = 0;
-	wchar_t*   buffer = NULL;
+string NormalizePathEncoding(string imagePath) {
+	long       length = 0;
+	wchar_t*   buffer = nullptr;
 
 	// First obtain the size needed by passing NULL and 0.
-	length = GetShortPathName(ConvertToLPCWSTR(imagePath).c_str(), NULL, 0);
+	length = GetShortPathName(ConvertToLPCWSTR(imagePath).c_str(), nullptr, 0);
 
 	// Dynamically allocate the correct size 
 	// (terminating null char was included in length)
@@ -42,10 +41,10 @@ std::string NormalizePathEncoding(std::string imagePath) {
 	// Now simply call again using same long path.
 	length = GetShortPathName(ConvertToLPCWSTR(imagePath).c_str(), buffer, length);
 
-	using Codecvt = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<Codecvt, wchar_t> converter;
+	using Codecvt = codecvt_utf8<wchar_t>;
+	wstring_convert<Codecvt, wchar_t> converter;
 
-	std::string returnString = converter.to_bytes(buffer);
+	string returnString = converter.to_bytes(buffer);
 
 	if (buffer) {
 		delete[] buffer;
@@ -93,7 +92,7 @@ void ReduceToHashMock(const std::string& currentPath, const std::vector<boost::f
 }
 #endif
 
-void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, char*>& imageHashes) {
+void ImageProcessor::ReduceToHash(const string& currentPath, const vector<boost::filesystem::path>& filePaths, map<string, char*>& imageHashes) {
 #if _DEBUG
 	cout << "WARNING: MOCK MODE - Extracted file paths will be ignored" << std::endl;
 	ReduceToHashMock(currentPath, filePaths, imageHashes);
@@ -104,8 +103,8 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 
 	for (const boost::filesystem::path& p : filePaths)
 	{
-		std::string imagePath = p.string();
-		cout << "\t Opening image: " << imagePath << std::endl;
+		string imagePath = p.string();
+		cout << "\t Opening image: " << imagePath << endl;
 		auto normalizedPath = NormalizePathEncoding(imagePath);
 		Magick::Image image;
 
@@ -121,14 +120,13 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 			}
 			catch (Exception &suberror_)
 			{
-				cout << "Could not open image: " << error_.what() << endl;
+				cout << "Could not open image: " << suberror_.what() << endl;
 				continue;
 			}
 		}
 
 		try {
 			///*DEBUG*/cout << "\t\t Image opened" << std::endl;
-
 			image.modifyImage();
 			image.quantizeColorSpace(GRAYColorspace);
 			image.quantizeColors(256);
@@ -141,7 +139,7 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 			ssize_t h = image.rows();
 
 			char *hash = new char[HASH_SIZE + 1];
-			std::fill(hash, hash + HASH_SIZE, '0');
+			fill(hash, hash + HASH_SIZE, '0');
 			hash[HASH_SIZE] = '\0';
 			
 			for (ssize_t y = 0; y < QUANTIZATION_SIZE; ++y) {
@@ -172,7 +170,7 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 				}
 			}
 
-			imageHashes.insert(std::pair<std::string, char*>(p.string(), hash));
+			imageHashes.insert(pair<string, char*>(p.string(), hash));
 		}
 		catch (Exception &error_)
 		{
@@ -181,15 +179,15 @@ void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vec
 	}
 }
 
-void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, std::pair<double_t, double_t*>>& imageMagnitudes) {
-	MagickCore::MagickCoreGenesis(currentPath.c_str(), MagickCore::MagickTrue);
+void ImageProcessor::ReduceWithDFT(const string& currentPath, const vector<boost::filesystem::path>& filePaths, map<string, pair<double_t, double_t*>>& imageMagnitudes) {
+	MagickCoreGenesis(currentPath.c_str(), MagickTrue);
 	InitializeMagick(currentPath.c_str());
 	ExceptionInfo *exceptionInfo = AcquireExceptionInfo();
 
 	for (const boost::filesystem::path& p : filePaths)
 	{
-		std::string imagePath = p.string();
-		cout << "\t Opening image: " << imagePath << std::endl;
+		string imagePath = p.string();
+		cout << "\t Opening image: " << imagePath << endl;
 		auto normalizedPath = NormalizePathEncoding(imagePath);
 		Magick::Image image;
 		
@@ -205,27 +203,21 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 			}
 			catch (Exception &suberror_)
 			{
-				cout << "Could not open image: " << error_.what() << endl;
+				cout << "Could not open image: " << suberror_.what() << endl;
 				continue;
 			}
 		}
 
 		try {
 			///*DEBUG*/cout << "\t\t Image opened" << std::endl;
-
 			image.modifyImage();
-			Geometry newSize = Geometry(PRE_TRANSFORM_SIZE, PRE_TRANSFORM_SIZE, 0, 0);
+			Geometry newSize = Geometry(DFT_IMAGE_WIDTH, DFT_IMAGE_WIDTH, 0, 0);
 			newSize.aspect(true);
 			image.resize(newSize);
-			ssize_t w = image.columns();
-			ssize_t h = image.rows();
-			/*DEBUG*/cout << "\t\t Image resized: current size is " << w << "x" << h << std::endl;
+			image = ForwardFourierTransformImage(image.constImage(), MagickTrue, exceptionInfo);
 
-			image = ForwardFourierTransformImage(image.constImage(), MagickCore::MagickTrue, exceptionInfo);
-			w = image.columns();
-			h = image.rows();
 			///*DEBUG*/cout << "\t\t DFT applied: current size is " << w << "x" << h << std::endl;
-			ssize_t imageSize = w * h;
+			size_t imageSize = DFT_IMAGE_HEIGHT * DFT_IMAGE_WIDTH;
 
 			///*DEBUG*/cout << "\t\t Initializing magnitudes" << std::endl;
 			double_t *magnitudes = new double_t[imageSize + 1];
@@ -234,8 +226,8 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 			double_t totalMagnitude = 0.0;
 
 			///*DEBUG*/cout << "\t\t Setting magnitudes" << std::endl;
-			for (ssize_t x = 0; x < w; ++x) {
-				for (ssize_t y = 0; y < h; ++y) {
+			for (ssize_t x = 0; x < DFT_IMAGE_WIDTH; ++x) {
+				for (ssize_t y = 0; y < DFT_IMAGE_HEIGHT; ++y) {
 					Quantum* quantum = image.getPixels(x, y, 1, 1);
 					magnitudes[x*y + y] = *quantum;
 					//totalMagnitude += magnitudes[x*y + y];
@@ -244,10 +236,9 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 				}
 			}
 
-			
 			///*DEBUG*/cout << "\t\t Doing final assignments" << imagePath << std::endl;
-			magnitudeMedian = totalMagnitude / (double_t)imageSize;
-			imageMagnitudes[imagePath] = std::pair<double_t, double_t*>(magnitudeMedian, magnitudes);
+			magnitudeMedian = totalMagnitude / static_cast<double_t>(imageSize);
+			imageMagnitudes[imagePath] = pair<double_t, double_t*>(magnitudeMedian, magnitudes);
 
 			///*DEBUG*/cout << "\t\t Magnitude median: " << magnitudeMedian << std::endl;
 		}
@@ -258,5 +249,5 @@ void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::ve
 	}
 
 	DestroyExceptionInfo(exceptionInfo);
-	MagickCore::MagickCoreTerminus();
+	MagickCoreTerminus();
 }

@@ -12,18 +12,18 @@ FileSystem::~FileSystem()
 {
 }
 
-void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::filesystem::path>& filePaths)
+void FileSystem::GetImagePaths(const string & dir_path, vector<boost::filesystem::path>& filePaths)
 {
 	MagickCore::ExceptionInfo* exceptionInfo = MagickCore::AcquireExceptionInfo();
 	size_t number_formats;
 
-	char** formats = MagickCore::GetMagickList("*", &number_formats, exceptionInfo);
-	map<std::string, bool> formatIndex;
+	char** formats = GetMagickList("*", &number_formats, exceptionInfo);
+	map<string, bool> formatIndex;
 
 	int i = 0;
 	while (i < number_formats) {
 		boost::to_upper(formats[i]);
-		formatIndex.insert(std::pair<std::string, bool>(std::string(formats[i]), true));
+		formatIndex.insert(pair<string, bool>(string(formats[i]), true));
 		++i;
 	}
 
@@ -39,7 +39,7 @@ void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::
 	{
 		if (!is_directory(*itr))
 		{
-			std::string fileExt = itr->path().extension().string();
+			string fileExt = itr->path().extension().string();
 			boost::erase_all(fileExt, ".");
 			boost::to_upper(fileExt);
 
@@ -57,5 +57,5 @@ void FileSystem::GetImagePaths(const std::string & dir_path, std::vector<boost::
 		}
 	}
 
-	(void)MagickCore::DestroyExceptionInfo(exceptionInfo);
+	(void)DestroyExceptionInfo(exceptionInfo);
 }

@@ -4,13 +4,13 @@
 #include "../ImageProcessor/ImageProcessor.h"
 #include "../ImageIndexer/ImageIndexer.h"
 
-void FindMatchesWithQuantizationComparer(int argc, char* argv[], std::vector<boost::filesystem::path> paths) {
-	std::map<std::string, char*> imageHashes;
+void FindMatchesWithQuantizationComparer(char* argv[], vector<boost::filesystem::path> paths) {
+	map<string, char*> imageHashes;
 
 	// Hash creation
 	ImageProcessor imageProcessor;
 	imageProcessor.ReduceToHash(argv[0], paths, imageHashes);
-	std::cout << std::endl << "Finished reducing images, " << imageHashes.size() << " elements processed" << std::endl << std::endl;
+	cout << endl << "Finished reducing images, " << imageHashes.size() << " elements processed" << endl << endl;
 
 #if _DEBUG
 	std::cout << "Computed hashes:" << std::endl;
@@ -21,80 +21,80 @@ void FindMatchesWithQuantizationComparer(int argc, char* argv[], std::vector<boo
 #endif
 
 	// Hash indexing
-	std::cout << std::endl << "Generating image index:" << std::endl;
+	cout << endl << "Generating image index:" << endl;
 	ImageIndexer imageIndexer;
-	std::vector<vector<pair<std::string, char*>>> imageIndex = imageIndexer.CreateIndex(imageHashes);
+	vector<vector<pair<string, char*>>> imageIndex = imageIndexer.CreateIndex(imageHashes);
 
-	std::cout << "\tListing element(s):" << std::endl;
+	cout << "\tListing element(s):" << endl;
 	for (auto const& imageIndexElement : imageIndex)
 	{
 		if (imageIndexElement.size() > 1) {
-			std::cout << "\t\t-Image similarity found:" << std::endl;
+			cout << "\t\t-Image similarity found:" << endl;
 
 			for (auto const& imageIndexKey : imageIndexElement)
 			{
-				std::cout << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << std::endl;
+				cout << "\t\t" << imageIndexKey.second << " - " << imageIndexKey.first << endl;
 			}
 		}
 	}
 }
 
-void FindMatchesWithRankDFTComparer(int argc, char* argv[], std::vector<boost::filesystem::path> paths) {
-	std::map<std::string, std::pair<double_t, double_t*>> imageHashes;
+void FindMatchesWithRankDFTComparer(char* argv[], vector<boost::filesystem::path> paths) {
+	map<string, pair<double_t, double_t*>> imageHashes;
 
 	// Magnitudes creation
 	ImageProcessor imageProcessor;
 	imageProcessor.ReduceWithDFT(argv[0], paths, imageHashes);
-	std::cout << std::endl << "Finished reducing images, " << imageHashes.size() << " elements processed" << std::endl << std::endl;
+	cout << endl << "Finished reducing images, " << imageHashes.size() << " elements processed" << endl << endl;
 
 	// Magnitude indexing
-	std::cout << std::endl << "Generating image index:" << std::endl;
+	cout << endl << "Generating image index:" << endl;
 	ImageIndexer imageIndexer;
-	std::vector<std::vector<ImageMagnitudeData>> imageIndex = imageIndexer.CreateRankDFTIndex(imageHashes);
+	vector<vector<ImageMagnitudeData>> imageIndex = imageIndexer.CreateRankDFTIndex(imageHashes);
 
-	std::cout << "\tListing element(s):" << std::endl;
-	for (std::vector<ImageMagnitudeData>& imageIndexElement : imageIndex)
+	cout << "\tListing element(s):" << endl;
+	for (vector<ImageMagnitudeData>& imageIndexElement : imageIndex)
 	{
 		if (imageIndexElement.size() > 1) {
-			std::cout << "\t\t-Image similarity found:" << std::endl;
+			cout << "\t\t-Image similarity found:" << endl;
 
 			for (ImageMagnitudeData& imageIndexKey : imageIndexElement)
 			{
 				cout << fixed << showpoint;
 				cout << setprecision(20);
-				std::cout << "\t\t" << imageIndexKey.distance << " - " << imageIndexKey.filePath << std::endl;
+				cout << "\t\t" << imageIndexKey.distance << " - " << imageIndexKey.filePath << endl;
 			}
 		}
 	}
 }
 
 
-std::vector<boost::filesystem::path> init(int argc, char* argv[]) {
-	throw_assert((argc > 1), "Invalid argument count");
+vector<boost::filesystem::path> init(int argc, char* argv[]) {
+	throw_assert( argc > 1, "Invalid argument count");
 	char* filePath = argv[1];
 
 	// Initialization
-	std::vector<boost::filesystem::path> paths;
+	vector<boost::filesystem::path> paths;
 
 
 	// Path retrieval
 	FileSystem fileSystem;
 	fileSystem.GetImagePaths(filePath, paths);
-	std::cout << "Found " << paths.size() << " elements. Processing" << std::endl;
+	cout << "Found " << paths.size() << " elements. Processing" << endl;
 	
 	return paths;
 }
 
 void end() {
-	std::cout << std::endl << "Finished. Press enter to exit" << std::endl;
-	std::getchar();
+	cout << endl << "Finished. Press enter to exit" << endl;
+	getchar();
 }
 
 int main(int argc, char* argv[])
 {
-	std::vector<boost::filesystem::path> paths = init(argc, argv);
+	vector<boost::filesystem::path> paths = init(argc, argv);
 
-	FindMatchesWithRankDFTComparer(argc, argv, paths);
+	FindMatchesWithRankDFTComparer(argv, paths);
 
 	end();
 	return 0;

@@ -9,7 +9,7 @@
 using namespace std;
 
 struct ImageMagnitudeData {
-	std::string filePath;
+	string filePath;
 	double_t distance;
 	double_t magnitudeMedian;
 	double_t* imageMagnitudes;
@@ -20,7 +20,7 @@ class __declspec(dllexport) ImageIndexer
 public:
 	ImageIndexer();
 	~ImageIndexer();
-	std::vector<vector<pair<std::string, char*>>> ImageIndexer::CreateIndex(std::map<std::string, char*> imageHashes);
-	std::vector<std::vector<ImageMagnitudeData>> ImageIndexer::CreateRankDFTIndex(std::map<std::string, std::pair<double_t, double_t*>>& imageMagnitudes);
+	static vector<vector<pair<string, char*>>> ImageIndexer::CreateIndex(map<string, char*> imageHashes);
+	static vector<vector<ImageMagnitudeData>> ImageIndexer::CreateRankDFTIndex(map<string, pair<double_t, double_t*>>& imageMagnitudes);
 };
 
