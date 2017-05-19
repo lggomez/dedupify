@@ -40,7 +40,7 @@ void FindMatchesWithQuantizationComparer(char* argv[], vector<boost::filesystem:
 }
 
 void FindMatchesWithRankDFTComparer(char* argv[], vector<boost::filesystem::path> paths) {
-	map<string, pair<double_t, double_t*>> imageHashes;
+	 map<string, DftImageData> imageHashes;
 
 	// Magnitudes creation
 	ImageProcessor imageProcessor;
@@ -50,15 +50,15 @@ void FindMatchesWithRankDFTComparer(char* argv[], vector<boost::filesystem::path
 	// Magnitude indexing
 	cout << endl << "Generating image index:" << endl;
 	ImageIndexer imageIndexer;
-	vector<vector<ImageMagnitudeData>> imageIndex = imageIndexer.CreateRankDFTIndex(imageHashes);
+	vector<vector<ImageData>> imageIndex = imageIndexer.CreateRankDFTIndex(imageHashes);
 
 	cout << "\tListing element(s):" << endl;
-	for (vector<ImageMagnitudeData>& imageIndexElement : imageIndex)
+	for (vector<ImageData>& imageIndexElement : imageIndex)
 	{
 		if (imageIndexElement.size() > 1) {
 			cout << "\t\t-Image similarity found:" << endl;
 
-			for (ImageMagnitudeData& imageIndexKey : imageIndexElement)
+			for (ImageData& imageIndexKey : imageIndexElement)
 			{
 				cout << fixed << showpoint;
 				cout << setprecision(20);
@@ -69,12 +69,11 @@ void FindMatchesWithRankDFTComparer(char* argv[], vector<boost::filesystem::path
 }
 
 vector<boost::filesystem::path> init(int argc, char* argv[]) {
-	throw_assert( argc > 1, "Invalid argument count");
+	throw_assert(argc > 1, "Invalid argument count");
 	char* filePath = argv[1];
 
 	// Initialization
 	vector<boost::filesystem::path> paths;
-
 
 	// Path retrieval
 	FileSystem fileSystem;
@@ -93,6 +92,7 @@ int main(int argc, char* argv[])
 {
 	vector<boost::filesystem::path> paths = init(argc, argv);
 
+	//FindMatchesWithQuantizationComparer(argv, paths);
 	FindMatchesWithRankDFTComparer(argv, paths);
 
 	end();
