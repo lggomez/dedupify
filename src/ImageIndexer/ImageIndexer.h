@@ -8,7 +8,7 @@
 #include <ImageMagick/include/MagickCore/MagickCore.h>
 #include <../DeDupify/ThrowAssert.hpp>
 #include <../DeDupify/constants.hpp>
-#include <../DeDupify/structs.h>
+#include <../DeDupify/structs.hpp>
 
 using namespace std;
 

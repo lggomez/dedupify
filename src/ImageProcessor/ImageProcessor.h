@@ -12,7 +12,7 @@
 #include <ImageMagick/include/MagickCore/MagickCore.h>
 #include <../External/fttw/include/fftw3.h>
 #include <../DeDupify/constants.hpp>
-#include <../DeDupify/structs.h>
+#include <../DeDupify/structs.hpp>
 
 class __declspec(dllexport) ImageProcessor
 {
