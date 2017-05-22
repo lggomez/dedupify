@@ -34,12 +34,12 @@ double_t RankDFT(DftImageData a, DftImageData b, size_t n) {
 
 	for (size_t i = 0; i < n; i++)
 	{
-		Color phaseColora = a.magColors[i];
-		Color phaseColorb = b.magColors[i];
+		Color phaseColora = a.magnitudeColors[i];
+		Color phaseColorb = b.magnitudeColors[i];
 		double_t aSquaredModule = pow(phaseColora.quantumRed(), 2) + pow(phaseColora.quantumGreen(), 2) + pow(phaseColora.quantumBlue(), 2);
 		double_t bSquaredModule = pow(phaseColorb.quantumRed(), 2) + pow(phaseColorb.quantumGreen(), 2) + pow(phaseColorb.quantumBlue(), 2);
 
-		subresult_a += a.imageMagnitudes[i] * b.imageMagnitudes[i] - n * (a.frequencyMedian * b.frequencyMedian);
+		subresult_a += a.magnitudeQuantums[i] * b.magnitudeQuantums[i] - n * (a.frequencyMedian * b.frequencyMedian);
 		subresult_b += aSquaredModule - n * pow(a.frequencyMedian, 2);
 		subresult_c += bSquaredModule - n * pow(b.frequencyMedian, 2);
 	}
