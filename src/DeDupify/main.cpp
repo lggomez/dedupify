@@ -92,7 +92,10 @@ int main(int argc, char* argv[])
 {
 	vector<boost::filesystem::path> paths = init(argc, argv);
 
-	//FindMatchesWithQuantizationComparer(argv, paths);
+	cout << endl << "Processing with dHash distance" << endl;
+	FindMatchesWithQuantizationComparer(argv, paths);
+
+	cout << endl << "Processing with DFT distance" << endl;
 	FindMatchesWithRankDFTComparer(argv, paths);
 
 	end();

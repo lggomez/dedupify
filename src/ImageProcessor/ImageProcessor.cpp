@@ -189,7 +189,7 @@ void ImageProcessor::ReduceToHash(const string& currentPath, const vector<boost:
 	for (const boost::filesystem::path& p : filePaths)
 	{
 		string imagePath = p.string();
-		cout << "\t Opening image: " << imagePath << endl;
+		//cout << "\t Opening image: " << imagePath << endl;
 		auto normalizedPath = NormalizePathEncoding(imagePath);
 		Magick::Image image;
 
@@ -272,7 +272,7 @@ void ImageProcessor::ReduceWithDFT(const string& currentPath, const vector<boost
 	for (const boost::filesystem::path& p : filePaths)
 	{
 		string imagePath = p.string();
-		cout << "\t Opening image: " << imagePath << endl;
+		//cout << "\t Opening image: " << imagePath << endl;
 		auto normalizedPath = NormalizePathEncoding(imagePath);
 		Magick::Image image;
 		

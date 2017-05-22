@@ -124,7 +124,7 @@ vector<vector<DftImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftIma
 			for (DftImageData& subImageData : imageIndexElement)
 			{
 				imageData.distance = RankDFT(imageData, subImageData, DFT_IMAGE_HEIGHT * DFT_IMAGE_WIDTH);
-				if (imageData.distance/* > 0.99999999999*/) { //TODO TEST: Add a criteria after verifying the algorithm
+				if (imageData.distance/* > 1.00000000000*/) { //TODO TEST: Add a criteria after verifying the algorithm
 					// There is a match, so we add the current match to the index element
 					match = true;
 					imageIndexElement.push_back(imageData);
