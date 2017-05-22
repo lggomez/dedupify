@@ -27,19 +27,19 @@ bool HashesAreSimilar(const char* a, const char* b, const size_t size, const siz
 	return 1ULL << threshold >= returnValue;
 }
 
-double_t RankDFT(ImageData a, ImageData b, size_t n) {
+double_t RankDFT(DftImageData a, DftImageData b, size_t n) {
 	double_t subresult_a = 0.0;
 	double_t subresult_b = 0.0;
 	double_t subresult_c = 0.0;
 
 	for (size_t i = 0; i < n; i++)
 	{
-		Color phaseColora = a.phaseColors[i];
-		Color phaseColorb = b.phaseColors[i];
+		Color phaseColora = a.magColors[i];
+		Color phaseColorb = b.magColors[i];
 		double_t aSquaredModule = pow(phaseColora.quantumRed(), 2) + pow(phaseColora.quantumGreen(), 2) + pow(phaseColora.quantumBlue(), 2);
 		double_t bSquaredModule = pow(phaseColorb.quantumRed(), 2) + pow(phaseColorb.quantumGreen(), 2) + pow(phaseColorb.quantumBlue(), 2);
 
-		subresult_a += a.imageMagnitudes[i] * b.imageMagnitudes[i] - n * (a.magnitudeMedian * b.magnitudeMedian);
+		subresult_a += a.imageMagnitudes[i] * b.imageMagnitudes[i] - n * (a.frequencyMedian * b.frequencyMedian);
 		subresult_b += aSquaredModule - n * pow(a.frequencyMedian, 2);
 		subresult_c += bSquaredModule - n * pow(b.frequencyMedian, 2);
 	}
@@ -92,21 +92,23 @@ vector<vector<pair<string, char*>>> ImageIndexer::CreateIndex(map<string, char*>
 	return imageIndex;
 }
 
-vector<vector<ImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftImageData>& imageDftData) {
-	vector<vector<ImageData>> imageIndex;
+vector<vector<DftImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftImageData>& imageDftData) {
+	vector<vector<DftImageData>> imageIndex;
 
 	for (auto const& imageMagnitudeData : imageDftData)
 	{
-		ImageData imageData;
+		DftImageData imageData;
 		imageData.distance = 0.0;
 		imageData.filePath = imageMagnitudeData.first;
 		imageData.magnitudeMedian = imageMagnitudeData.second.magnitudeMedian;
+		imageData.frequencyMedian = imageMagnitudeData.second.frequencyMedian;
 		imageData.imageMagnitudes = imageMagnitudeData.second.imageMagnitudes;
 		imageData.phaseColors = imageMagnitudeData.second.phaseColors;
+		imageData.magColors = imageMagnitudeData.second.magColors;
 
 		if (imageIndex.size() == 0) {
 			// Initialize index with the first hash
-			vector<ImageData> imageIndexKeyList;
+			vector<DftImageData> imageIndexKeyList;
 			imageData.distance = 1;
 			imageIndexKeyList.push_back(imageData);
 			imageIndex.push_back(imageIndexKeyList);
@@ -116,13 +118,13 @@ vector<vector<ImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftImageD
 
 		// Traverse the index in search of matches in each indexKey lists
 		bool match = false;
-		for (vector<ImageData>& imageIndexElement : imageIndex)
+		for (vector<DftImageData>& imageIndexElement : imageIndex)
 		{
 			// Traverse each index key from the index element
-			for (ImageData& subImageData : imageIndexElement)
+			for (DftImageData& subImageData : imageIndexElement)
 			{
 				imageData.distance = RankDFT(imageData, subImageData, DFT_IMAGE_HEIGHT * DFT_IMAGE_WIDTH);
-				if (imageData.distance) { //TODO TEST: Add a criteria after verifying the algorithm
+				if (imageData.distance/* > 0.99999999999*/) { //TODO TEST: Add a criteria after verifying the algorithm
 					// There is a match, so we add the current match to the index element
 					match = true;
 					imageIndexElement.push_back(imageData);
@@ -133,7 +135,7 @@ vector<vector<ImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftImageD
 
 		if (!match) {
 			// No matches, add the key into its separate index element
-			vector<ImageData> imageIndexKeyList;
+			vector<DftImageData> imageIndexKeyList;
 			imageIndexKeyList.push_back(imageData);
 			imageIndex.push_back(imageIndexKeyList);
 		}

@@ -50,15 +50,15 @@ void FindMatchesWithRankDFTComparer(char* argv[], vector<boost::filesystem::path
 	// Magnitude indexing
 	cout << endl << "Generating image index:" << endl;
 	ImageIndexer imageIndexer;
-	vector<vector<ImageData>> imageIndex = imageIndexer.CreateRankDFTIndex(imageHashes);
+	vector<vector<DftImageData>> imageIndex = imageIndexer.CreateRankDFTIndex(imageHashes);
 
 	cout << "\tListing element(s):" << endl;
-	for (vector<ImageData>& imageIndexElement : imageIndex)
+	for (vector<DftImageData>& imageIndexElement : imageIndex)
 	{
 		if (imageIndexElement.size() > 1) {
 			cout << "\t\t-Image similarity found:" << endl;
 
-			for (ImageData& imageIndexKey : imageIndexElement)
+			for (DftImageData& imageIndexKey : imageIndexElement)
 			{
 				cout << fixed << showpoint;
 				cout << setprecision(20);

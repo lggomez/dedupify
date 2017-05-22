@@ -316,17 +316,23 @@ void ImageProcessor::ReduceWithDFT(const string& currentPath, const vector<boost
 
 			DftImageData dftImageData;
 			dftImageData.phaseColors = new Color[imageSize];
+			dftImageData.magColors = new Color[imageSize];
 			dftImageData.imageMagnitudes = new double_t[imageSize];
 
 			///*DEBUG*/cout << "\t\t Setting magnitudes" << std::endl;
 			for (ssize_t x = 0; x < DFT_IMAGE_WIDTH; ++x) {
 				for (ssize_t y = 0; y < DFT_IMAGE_HEIGHT; ++y) {
 					Quantum* magQuantum = mag.getPixels(x, y, 1, 1);
-					dftImageData.imageMagnitudes[x*y + y] = *magQuantum;
-
-					Color pixelColor = phase.pixelColor(x, y);
 					Quantum* phaseQuantum = phase.getPixels(x, y, 1, 1);
-					dftImageData.phaseColors[x*y + y] = pixelColor;
+
+					dftImageData.imageMagnitudes[x*y + y] = *magQuantum;
+					
+					Color magPixelColor = mag.pixelColor(x, y);
+					dftImageData.magColors[x*y + y] = magPixelColor;
+
+					Color phasePixelColor = phase.pixelColor(x, y);
+					dftImageData.phaseColors[x*y + y] = phasePixelColor;
+
 					totalMagnitude += *magQuantum;
 					totalPhase += *phaseQuantum;
 				}

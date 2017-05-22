@@ -18,6 +18,6 @@ public:
 	ImageIndexer();
 	~ImageIndexer();
 	static vector<vector<pair<string, char*>>> ImageIndexer::CreateIndex(map<string, char*> imageHashes);
-	static vector<vector<ImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftImageData>& imageDftData);
+	static vector<vector<DftImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftImageData>& imageDftData);
 };
 
