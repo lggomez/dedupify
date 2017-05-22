@@ -53,25 +53,25 @@ string NormalizePathEncoding(string imagePath) {
 	return returnString;
 }
 
-void ApplyDiscreteFourierTransform(size_t squareSize, Magick::Image *pixels, Magick::Image* outMag, Magick::Image* outPhase)
+void ApplyDiscreteFourierTransform(size_t squareLength, Magick::Image *pixels, Magick::Image* outMag, Magick::Image* outPhase)
 {
 	// allocate input arrays
-	fftw_complex *inR = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize));
-	fftw_complex *inG = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize));
-	fftw_complex *inB = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize));
+	fftw_complex *inR = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareLength * squareLength));
+	fftw_complex *inG = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareLength * squareLength));
+	fftw_complex *inB = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareLength * squareLength));
 
 	// allocate output arrays
-	fftw_complex *outR = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize));
-	fftw_complex *outG = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize));
-	fftw_complex *outB = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareSize * squareSize));
+	fftw_complex *outR = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareLength * squareLength));
+	fftw_complex *outG = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareLength * squareLength));
+	fftw_complex *outB = static_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * squareLength * squareLength));
 
 	// create plans
-	fftw_plan planR = fftw_plan_dft_2d(squareSize, squareSize, inR, outR, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan planG = fftw_plan_dft_2d(squareSize, squareSize, inG, outG, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan planB = fftw_plan_dft_2d(squareSize, squareSize, inB, outB, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan planR = fftw_plan_dft_2d(squareLength, squareLength, inR, outR, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan planG = fftw_plan_dft_2d(squareLength, squareLength, inG, outG, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan planB = fftw_plan_dft_2d(squareLength, squareLength, inB, outB, FFTW_FORWARD, FFTW_ESTIMATE);
 
 	// assign values to real parts (values between 0 and MaxRGB)
-	for (int i = 0; i < squareSize * squareSize; i++) {
+	for (int i = 0; i < squareLength * squareLength; i++) {
 		size_t index_x = floor(i / DFT_IMAGE_WIDTH);
 		size_t index_y = floor(i % DFT_IMAGE_WIDTH);
 
@@ -92,16 +92,16 @@ void ApplyDiscreteFourierTransform(size_t squareSize, Magick::Image *pixels, Mag
 	fftw_execute(planB);
 
 	// transform imaginary number to phase and magnitude and save to output
-	for (size_t i = 0; i < squareSize * squareSize; i++) {
+	for (size_t i = 0; i < squareLength * squareLength; i++) {
 		// normalize values
-		double_t realR = outR[i][0] / static_cast<double_t>(squareSize * squareSize);
-		double_t imagR = outR[i][1] / static_cast<double_t>(squareSize * squareSize);
+		double_t realR = outR[i][0] / static_cast<double_t>(squareLength * squareLength);
+		double_t imagR = outR[i][1] / static_cast<double_t>(squareLength * squareLength);
 
-		double_t realG = outG[i][0] / static_cast<double_t>(squareSize * squareSize);
-		double_t imagG = outG[i][1] / static_cast<double_t>(squareSize * squareSize);
+		double_t realG = outG[i][0] / static_cast<double_t>(squareLength * squareLength);
+		double_t imagG = outG[i][1] / static_cast<double_t>(squareLength * squareLength);
 
-		double_t realB = outB[i][0] / static_cast<double_t>(squareSize * squareSize);
-		double_t imagB = outB[i][1] / static_cast<double_t>(squareSize * squareSize);
+		double_t realB = outB[i][0] / static_cast<double_t>(squareLength * squareLength);
+		double_t imagB = outB[i][1] / static_cast<double_t>(squareLength * squareLength);
 
 		// magnitude
 		double_t magR = sqrt((realR * realR) + (imagR * imagR));
@@ -300,14 +300,14 @@ void ImageProcessor::ReduceWithDFT(const string& currentPath, const vector<boost
 			newSize.aspect(true);
 			image.extent(newSize);
 
-			Color black(0, 0, 0);
-			Magick::Image mag(newSize, black);
-			Magick::Image phase(newSize, black);
-			mag.modifyImage();
-			phase.modifyImage();
+			Color black(0, 0, 0, MAX_RGB, MAX_RGB);
+			Magick::Image magnitudeOutput(newSize, black);
+			Magick::Image phaseOutput(newSize, black);
+			magnitudeOutput.modifyImage();
+			phaseOutput.modifyImage();
 
 			// Perform DFT
-			ApplyDiscreteFourierTransform(DFT_IMAGE_WIDTH, &image, &mag, &phase);
+			ApplyDiscreteFourierTransform(DFT_IMAGE_WIDTH, &image, &magnitudeOutput, &phaseOutput);
 
 			///*DEBUG*/cout << "\t\t DFT applied: current size is " << w << "x" << h << std::endl;
 			size_t imageSize = DFT_IMAGE_HEIGHT * DFT_IMAGE_WIDTH;
@@ -316,21 +316,23 @@ void ImageProcessor::ReduceWithDFT(const string& currentPath, const vector<boost
 
 			DftImageData dftImageData;
 			dftImageData.phaseColors = new Color[imageSize];
-			dftImageData.magColors = new Color[imageSize];
-			dftImageData.imageMagnitudes = new double_t[imageSize];
+			dftImageData.magnitudeColors = new Color[imageSize];
+			dftImageData.magnitudeQuantums = new double_t[imageSize];
+			dftImageData.phaseQuantums = new double_t[imageSize];
 
 			///*DEBUG*/cout << "\t\t Setting magnitudes" << std::endl;
 			for (ssize_t x = 0; x < DFT_IMAGE_WIDTH; ++x) {
 				for (ssize_t y = 0; y < DFT_IMAGE_HEIGHT; ++y) {
-					Quantum* magQuantum = mag.getPixels(x, y, 1, 1);
-					Quantum* phaseQuantum = phase.getPixels(x, y, 1, 1);
+					Quantum* magQuantum = magnitudeOutput.getPixels(x, y, 1, 1);
+					Quantum* phaseQuantum = phaseOutput.getPixels(x, y, 1, 1);
 
-					dftImageData.imageMagnitudes[x*y + y] = *magQuantum;
+					dftImageData.magnitudeQuantums[x*y + y] = *magQuantum;
+					dftImageData.phaseQuantums[x*y + y] = *phaseQuantum;
 					
-					Color magPixelColor = mag.pixelColor(x, y);
-					dftImageData.magColors[x*y + y] = magPixelColor;
+					Color magPixelColor = magnitudeOutput.pixelColor(x, y);
+					dftImageData.magnitudeColors[x*y + y] = magPixelColor;
 
-					Color phasePixelColor = phase.pixelColor(x, y);
+					Color phasePixelColor = phaseOutput.pixelColor(x, y);
 					dftImageData.phaseColors[x*y + y] = phasePixelColor;
 
 					totalMagnitude += *magQuantum;

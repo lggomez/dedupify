@@ -19,7 +19,7 @@ class __declspec(dllexport) ImageProcessor
 public:
 	ImageProcessor();
 	~ImageProcessor();
-	static void ImageProcessor::ReduceToHash(const string& currentPath, const vector<boost::filesystem::path>& filePaths, map<string, char*>& imageHashes);
-	static void ImageProcessor::ReduceWithDFT(const string& currentPath, const vector<boost::filesystem::path>& filePaths,  map<string, DftImageData>& imageDftData);
+	static void ImageProcessor::ReduceToHash(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, char*>& imageHashes);
+	static void ImageProcessor::ReduceWithDFT(const std::string& currentPath, const std::vector<boost::filesystem::path>& filePaths, std::map<std::string, DftImageData>& imageDftData);
 };
 

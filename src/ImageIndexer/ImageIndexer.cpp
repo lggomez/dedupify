@@ -102,9 +102,10 @@ vector<vector<DftImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftIma
 		imageData.filePath = imageMagnitudeData.first;
 		imageData.magnitudeMedian = imageMagnitudeData.second.magnitudeMedian;
 		imageData.frequencyMedian = imageMagnitudeData.second.frequencyMedian;
-		imageData.imageMagnitudes = imageMagnitudeData.second.imageMagnitudes;
+		imageData.magnitudeQuantums = imageMagnitudeData.second.magnitudeQuantums;
 		imageData.phaseColors = imageMagnitudeData.second.phaseColors;
-		imageData.magColors = imageMagnitudeData.second.magColors;
+		imageData.magnitudeColors = imageMagnitudeData.second.magnitudeColors;
+		imageData.phaseQuantums = imageMagnitudeData.second.phaseQuantums;
 
 		if (imageIndex.size() == 0) {
 			// Initialize index with the first hash
