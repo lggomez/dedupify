@@ -76,8 +76,8 @@ vector<vector<pair<string, char*>>> ImageIndexer::CreateIndex(map<string, char*>
 					// There is a match, so we add the current match to the index element
 					match = true;
 					imageIndexElement.push_back(imageIndexKey);
-					break;
 				}
+				break;
 			}
 		}
 
@@ -125,18 +125,20 @@ vector<vector<DftImageData>> ImageIndexer::CreateRankDFTIndex(map<string, DftIma
 			for (DftImageData& subImageData : imageIndexElement)
 			{
 				imageData.distance = RankDFT(imageData, subImageData, DFT_IMAGE_HEIGHT * DFT_IMAGE_WIDTH);
-				if (imageData.distance/* > 1.00000000000*/) { //TODO TEST: Add a criteria after verifying the algorithm
+				bool areDistancesSimilar = imageData.distance > 0.999999999990 && imageData.distance < 1.00000000001;
+				if (areDistancesSimilar) {
 					// There is a match, so we add the current match to the index element
 					match = true;
 					imageIndexElement.push_back(imageData);
-					break;
 				}
+				break;
 			}
 		}
 
 		if (!match) {
 			// No matches, add the key into its separate index element
 			vector<DftImageData> imageIndexKeyList;
+			imageData.distance = 1;
 			imageIndexKeyList.push_back(imageData);
 			imageIndex.push_back(imageIndexKeyList);
 		}
