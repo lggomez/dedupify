@@ -3,6 +3,7 @@
 
 using namespace std;
 using namespace boost::assign;
+using namespace Magick;
 
 ImageIndexer::ImageIndexer()
 {
@@ -33,8 +34,8 @@ double_t RankDFT(ImageData a, ImageData b, size_t n) {
 
 	for (size_t i = 0; i < n; i++)
 	{
-		Magick::Color phaseColora = a.phaseColors[i];
-		Magick::Color phaseColorb = b.phaseColors[i];
+		Color phaseColora = a.phaseColors[i];
+		Color phaseColorb = b.phaseColors[i];
 		double_t aSquaredModule = pow(phaseColora.quantumRed(), 2) + pow(phaseColora.quantumGreen(), 2) + pow(phaseColora.quantumBlue(), 2);
 		double_t bSquaredModule = pow(phaseColorb.quantumRed(), 2) + pow(phaseColorb.quantumGreen(), 2) + pow(phaseColorb.quantumBlue(), 2);
 

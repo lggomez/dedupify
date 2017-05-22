@@ -167,7 +167,7 @@ xcopy "$(SolutionDir)External\ImageMagick\lib\*.lib"  "$(SolutionDir)x64\Release
   <ItemGroup>
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="structs.h" />
+    <ClInclude Include="structs.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ThrowAssert.hpp" />
   </ItemGroup>

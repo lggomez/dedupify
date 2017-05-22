@@ -5,7 +5,7 @@
 
 using namespace std;
 
-struct ImageData {
+struct __declspec(dllexport) ImageData {
 	string filePath;
 	double_t distance;
 	double_t magnitudeMedian;
@@ -14,7 +14,7 @@ struct ImageData {
 	double_t frequencyMedian;
 };
 
-struct DftImageData {
+struct __declspec(dllexport) DftImageData {
 	double_t* imageMagnitudes;
 	Magick::Color* phaseColors;
 	double_t magnitudeMedian;
